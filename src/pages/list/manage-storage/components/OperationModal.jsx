@@ -69,6 +69,9 @@ const OperationModal = (props) => {
       let ret = await addTimeseriesWithTenantUsingPOST({path:path, dataType:form.getFieldValue('dataType2'),
         encoding:form.getFieldValue('encoding2')});
       if(ret.code == '0'){
+        notification.success({
+          message: 'Add timeseries ' + path + ' success',
+        });
         refresh();
       }else{
         notification.error({

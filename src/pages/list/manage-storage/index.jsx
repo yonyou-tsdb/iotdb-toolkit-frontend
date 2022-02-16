@@ -65,7 +65,7 @@ export const BasicList = () => {
     let ret = await showStorageWithTenantUsingPOST();
     if(ret.code == '0'){
       if(filter != null && filter != ''){
-        ret.data = ret.data.filter(array => array.value.match(filter));
+        ret.data = ret.data.filter(array => array.timeseries.match(filter));
       }
       setInitialState({ ...initialState, manageStorage_self: ret.data,
         manageStorage_self_totalCount: ret.data.length, manageStorage_self_current: 1, });
@@ -79,7 +79,7 @@ export const BasicList = () => {
     const ret = await showStorageWithTenantUsingPOST();
     if(ret.code == '0'){
       if(filter != null && filter != ''){
-        ret.data = ret.data.filter(array => array.value.match(filter));
+        ret.data = ret.data.filter(array => array.timeseries.match(filter));
       }
       setInitialState({ ...initialState, manageStorage_self: ret.data,
         manageStorage_self_totalCount: ret.data.length,
@@ -208,6 +208,9 @@ export const BasicList = () => {
   const handleDeleteItem = async(record) => {
     const ret = await deleteTimeseriesWithTenantUsingPOST({path:record.timeseries})
     if(ret.code == '0'){
+      notification.success({
+        message: 'Delete timeseries ' + record.timeseries + ' success',
+      });
       refresh();
     }else{
       notification.error({
@@ -221,7 +224,7 @@ export const BasicList = () => {
     let ret2 = await showSchemaWithTenantUsingPOST();
     let temp = ret.data;
     if(searchTimeseriesContent != null && searchTimeseriesContent != ''){
-      temp =  temp.filter(item => item.granularity.match(searchTimeseriesContent));
+      temp =  temp.filter(item => item.timeseries.match(searchTimeseriesContent));
     }
     setCurrentItem(temp);
     setCurrentValue(currentValue);
