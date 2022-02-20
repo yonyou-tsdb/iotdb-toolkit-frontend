@@ -2,10 +2,12 @@
 
 This project is the front-end of IoTDB-UI. IoTDB-UI is a management system that can deeply manage IoTDB. It provides precise management at the desktop software level. I hope it will be helpful for you when using IoTDB.
 
-## Required:
+## Required
 
 Node 14.0 or above
+
 Npm 6.0 or above
+
 Nginx
 
 ### Environment Prepare
@@ -14,12 +16,6 @@ Install `node_modules`:
 
 ```bash
 npm install
-```
-
-or
-
-```bash
-yarn
 ```
 
 ### Provided Scripts
@@ -40,11 +36,11 @@ npm run dev
 npm run build
 ```
 
-#### Deployment steps:
+#### Deployment steps
 
 1. In the project root directory execute `npm install` to install
 2. In the project root directory execute `npm run dev` to startup, 8000 port is used by default
-3. In the project root directory execute `npm run build` to build, map the contents in `/dist` to a port through nginx (For example 8040), and map server api to an end-point (For example http://localhost:8080/api/):
+3. In the project root directory execute `npm run build` to build, map the contents in `/dist` to a port through nginx (For example 8040), and map server api to an address (For example http://localhost:8080/api/):
 ```
 server {
 	listen		8040;
