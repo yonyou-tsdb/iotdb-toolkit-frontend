@@ -55,4 +55,4 @@ server {
 }
 ```
 4. If you enable the websocket feature on nginx, you can get a better user experience. If you do not enable it, it will not affect the use at all;
-5. Now use your browser to open the port you previously set (for example http://localhost:8040/ £©, start to enjoy iotdb!
+5. Now use your browser to open the port you previously set (for example http://localhost:8040/ ), start to enjoy iotdb!
