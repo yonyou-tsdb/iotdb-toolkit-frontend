@@ -16,8 +16,8 @@ import { addTimeseriesWithTenantUsingPOST } from '@/services/swagger1/iotDbContr
 const OperationModal = (props) => {
   const intl = useIntl();
   const { done, visible, current, setCurrent, onDone, children, editable, setEditable, changeState, createable,
-    setCreateable, onDeleteItem, refresh, currentSchema, currentValue, searchTimeseries, searchContent,
-    setSearchContent, } = props;
+    setCreateable, onDeleteItem, currentValue, searchTimeseries, searchContent,
+    setSearchContent, pageTimeseriesShowTotal, } = props;
   const { initialState, setInitialState } = useModel('@@initialState');
   const dataTypeArray = ['BOOLEAN', 'INT32', 'INT64', 'FLOAT', 'DOUBLE', 'TEXT'];
   const dataTypeEncodingMap = {'BOOLEAN':['PLAIN', 'RLE'], 'INT32':['PLAIN', 'RLE', 'TS_2DIFF', 'GORILLA'],
@@ -33,29 +33,6 @@ const OperationModal = (props) => {
   const [selectedPhysical, setSelectedPhysical] = React.useState(undefined);
   const [addAuth, setAddAuth] = React.useState(undefined);
   const [dataType2, setDataType2] = React.useState(undefined);
-  const handleProvinceChange = value => {
-    setSelectedSg(value);
-    setEntities(currentSchema[1][value]);
-    setSelectedEntity([]);
-    setPhysical([])
-    setSelectedPhysical([]);
-    setAddAuth([]);
-  };
-
-  const onGranularityChange = value => {
-    setSelectedSg([]);
-    setEntities(currentSchema[1][value]);
-    setSelectedEntity([]);
-    setPhysical([])
-    setSelectedPhysical([]);
-    setSelectedGranularity(value);
-  };
-
-  const onEntityChange = value => {
-    setSelectedEntity(value);
-    setPhysical(currentSchema[2][value]);
-    setSelectedPhysical([]);
-  };
 
   const onPhysicalChange = value => {
     setSelectedPhysical(value);
@@ -72,7 +49,6 @@ const OperationModal = (props) => {
         notification.success({
           message: 'Add timeseries ' + path + ' success',
         });
-        refresh();
       }else{
         notification.error({
           message: ret.message,
@@ -81,7 +57,6 @@ const OperationModal = (props) => {
     } catch (e) {
     }
   }
-
   const columns = [
     {
       title: intl.formatMessage({id: 'manageUser.privilege.granularity.entity',}),
@@ -176,6 +151,7 @@ const OperationModal = (props) => {
           ]}
           fieldProps={{
             // style:{ width: 150 }
+            addonBefore: currentValue + '.'
           }}
           placeholder={intl.formatMessage({id: 'createStorageGroup.entity.description',})}
         />
@@ -325,12 +301,14 @@ const OperationModal = (props) => {
         <Input.Search
           style={{width: '220px'}}
           placeholder={intl.formatMessage({id: 'createStorageGroup.timeseries.search.description',})}
-           onSearch={(filter) => {
+           onSearch={(filter,e) => {
+              e.preventDefault();
               searchTimeseries(currentValue,filter);
           }} onChange={(e) => {
             setSearchContent(e.target.value);
           }}
           value={searchContent}
+          addonBefore={currentValue+'.'}
           suffix={
               (searchContent==null||searchContent=='')?
               <CloseCircleFilled style={{ display: 'none' }} />:
@@ -339,7 +317,11 @@ const OperationModal = (props) => {
         />
       </Button.Group>
       </div>
-      <Table columns={columns} dataSource={current} pagination={{pageSize:10, showQuickJumper:true,}}/>
+      <Table columns={columns} dataSource={current} pagination={{
+        showTotal: pageTimeseriesShowTotal,
+        pageSize:10,
+        showQuickJumper:true,
+      }}/>
       {createable==true?(
         <Table columns={columns2} dataSource={[{key:null,granularity2:null,auth2:null}]} pagination={{hideOnSinglePage:true}} />
       ):null}

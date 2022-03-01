@@ -6,13 +6,15 @@ import {Avatar, Button, Card, Col, Dropdown, Input, List, Menu, Modal, Progress,
 import { PageContainer } from '@ant-design/pro-layout';
 import { useRequest, useModel, useIntl } from 'umi';
 import moment from 'moment';
+import { v4 as uuid } from 'uuid';
 import DateUtil from '../../../utils/DateUtil';
 import OperationModal from './components/OperationModal';
 import AddModal from './components/AddStorageModal';
 import EditStorageModal from './components/EditStorageModal';
 import { showTimeseriesWithTenantUsingPOST, changePrivilegesWithTenantUsingPOST,
-  showSchemaWithTenantUsingPOST, showStorageWithTenantUsingPOST,
+  showSchemaWithTenantUsingPOST, showStorageWithTenantUsingPOST, showStorageAppendWithTenantUsingPOST,
   deleteStorageGroupWithTenantUsingPOST, deleteTimeseriesWithTenantUsingPOST,
+  showTimeseriesAppendWithTenantUsingPOST,
  } from '@/services/swagger1/iotDbController';
 import styles from './style.less';
 const RadioButton = Radio.Button;
@@ -25,7 +27,6 @@ export const BasicList = () => {
   const [editModalVisible, setEditModalVisible] = useState(false);
   const [visible, setVisible] = useState(false);
   const [currentItem, setCurrentItem] = useState(undefined);
-  const [currentSchema, setCurrentSchema] = useState(undefined);
   const [currentValue, setCurrentValue] = useState(undefined);
   const { initialState, setInitialState } = useModel('@@initialState');
   const [doneResultStatus, setDoneResultStatus] = useState(undefined);
@@ -35,6 +36,10 @@ export const BasicList = () => {
   const [createable, setCreateable] = useState(false);
   const [searchContent, setSearchContent] = useState(undefined);
   const [searchTimeseriesContent, setSearchTimeseriesContent] = useState(undefined);
+  const [pageStorageGroupHasMore, setPageStorageGroupHasMore] = useState(false);
+  const [pageStorageGroupToken, setPageStorageGroupToken] = useState(undefined);
+  const [pageTimeseriesHasMore, setPageTimeseriesHasMore] = useState(false);
+  const [pageTimeseriesToken, setPageTimeseriesToken] = useState(undefined);
   const { getStringFromMillisecond } = DateUtil;
   const {
     data: listData,
@@ -46,12 +51,66 @@ export const BasicList = () => {
   const ListContent = ({ data: { timeseriesCount } }) => (
     <div className={styles.listContent}>
       <div className={styles.listContentItem2}>
-        <p>{intl.formatMessage({id: 'createStorageGroup.timeseries.count',})} {timeseriesCount}</p>
+        <p></p>
       </div>
     </div>
   );
   let totalCount = listData?.length || 1;
+  const pageStorageGroupShowTotal = (total) => {
+    return pageStorageGroupHasMore?
+    <a onClick = {pageStorageGroupAppend}>{intl.formatMessage({id: 'pages.loading.continue',})}</a>
+    :null;
+  }
+  const pageStorageGroupAppend = async() => {
+    const ret = await showStorageAppendWithTenantUsingPOST({token:pageStorageGroupToken})
+    if(ret.code == '0'){
+      let messageJson = JSON.parse(ret.message || '{}');
+      setPageStorageGroupHasMore(messageJson.hasMore);
+      setPageStorageGroupToken(messageJson.token);
+      let size = initialState.manageStorage_self_total.length;
+      for(let i=0;i<ret.data.length;i++){
+        initialState.manageStorage_self_total[size+i] = ret.data[i];
+      }
+      if(searchContent != null && searchContent != ''){
+        initialState.manageStorage_self = initialState.manageStorage_self_total.filter(
+          array => array.value.match(searchContent));
+      }else{
+        initialState.manageStorage_self = initialState.manageStorage_self_total;
+      }
+      setInitialState({ ...initialState, manageStorage_self: initialState.manageStorage_self,
+        manageStorage_self_totalCount: initialState.manageStorage_self.length,
+        manageStorage_self_total: initialState.manageStorage_self_total, });
+    }else{
+      notification.error({
+        message: ret.message,
+      });
+    }
+  }
+  const pageTimeseriesShowTotal = (total) => {
+    return pageTimeseriesHasMore?
+    <a onClick = {pageTimeseriesAppend}>{intl.formatMessage({id: 'pages.loading.continue',})}</a>
+    :null;
+  }
+  const pageTimeseriesAppend = async() => {
+    const ret = await showTimeseriesAppendWithTenantUsingPOST({token:pageTimeseriesToken});
+    if(ret.code=='0'){
+      let messageJson = JSON.parse(ret.message || '{}');
+      setPageTimeseriesHasMore(messageJson.hasMore);
+      setPageTimeseriesToken(messageJson.token);
+      let size = currentItem.length;
+      for(let i=0;i<ret.data.length;i++){
+        currentItem[size+i] = ret.data[i];
+      }
+      setCurrentItem([]);
+      setCurrentItem(currentItem);
+    }else{
+      notification.error({
+        message: ret.message,
+      });
+    }
+  }
   let paginationProps = {
+    showTotal: pageStorageGroupShowTotal,
     showQuickJumper: true,
     pageSize: 10,
     current: initialState.manageStorage_self_current===undefined?1:initialState.manageStorage_self_current,
@@ -62,13 +121,18 @@ export const BasicList = () => {
     },
   };
   const initItem = async(filter) => {
-    let ret = await showStorageWithTenantUsingPOST();
+    let token = uuid().replaceAll('-','');
+    let ret = await showStorageWithTenantUsingPOST({token: token});
     if(ret.code == '0'){
+      let messageJson = JSON.parse(ret.message || '{}');
+      setPageStorageGroupHasMore(messageJson.hasMore);
+      setPageStorageGroupToken(messageJson.token);
       if(filter != null && filter != ''){
-        ret.data = ret.data.filter(array => array.timeseries.match(filter));
+        ret.data = ret.data.filter(array => array.value.match(filter));
       }
       setInitialState({ ...initialState, manageStorage_self: ret.data,
-        manageStorage_self_totalCount: ret.data.length, manageStorage_self_current: 1, });
+        manageStorage_self_totalCount: ret.data.length, manageStorage_self_current: 1,
+        manageStorage_self_total: ret.data, });
     }else{
       notification.error({
         message: ret.message,
@@ -76,31 +140,26 @@ export const BasicList = () => {
     }
   }
   const change = async (filter)=>{
-    const ret = await showStorageWithTenantUsingPOST();
-    if(ret.code == '0'){
+      let data = initialState.manageStorage_self_total;
       if(filter != null && filter != ''){
-        ret.data = ret.data.filter(array => array.timeseries.match(filter));
+        data = data.filter(array => array.value.match(filter));
       }
-      setInitialState({ ...initialState, manageStorage_self: ret.data,
-        manageStorage_self_totalCount: ret.data.length,
+      setInitialState({ ...initialState, manageStorage_self: data,
+        manageStorage_self_totalCount: data.length,
         manageStorage_self_current: 1,
       });
-    }else{
-      notification.error({
-        message: ret.message,
-      });
-    }
   }
 
-  const showEditModal = async (e,item) => {
-    e.preventDefault();
+  const showEditModal = async (value) => {
     setSearchTimeseriesContent(null);
-    let ret = await showTimeseriesWithTenantUsingPOST({path:item.value});
-    let ret2 = await showSchemaWithTenantUsingPOST();
-    if(ret.code=='0' && ret2.code=='0'){
-      setCurrentSchema(ret2.data);
+    let token = uuid().replaceAll('-','');
+    let ret = await showTimeseriesWithTenantUsingPOST({path:value, token:token});
+    if(ret.code=='0'){
+      let messageJson = JSON.parse(ret.message || '{}');
+      setPageTimeseriesHasMore(messageJson.hasMore);
+      setPageTimeseriesToken(messageJson.token);
       setCurrentItem(ret.data);
-      setCurrentValue(item.value);
+      setCurrentValue(value);
       setVisible(true);
     }else{
       notification.error({
@@ -110,12 +169,18 @@ export const BasicList = () => {
   };
 
   const searchTimeseries = async (currentValue, filter) => {
-    let ret = await showTimeseriesWithTenantUsingPOST({path:currentValue});
-    let temp = ret.data;
-    if(filter != null && filter != ''){
-      temp =  temp.filter(item => item.timeseries.match(filter));
+    let token = uuid().replaceAll('-','');
+    let ret = await showTimeseriesWithTenantUsingPOST({path:currentValue+'.'+filter, token:token});
+    if(ret.code=='0'){
+      let messageJson = JSON.parse(ret.message || '{}');
+      setPageTimeseriesHasMore(messageJson.hasMore);
+      setPageTimeseriesToken(messageJson.token);
+      setCurrentItem(ret.data);
+    }else{
+      notification.error({
+        message: ret.message,
+      });
     }
-    setCurrentItem(temp);
   }
 
   const showAddModal = (e) => {
@@ -152,6 +217,7 @@ export const BasicList = () => {
     <Button.Group>
         <Button value="all" onClick={() => {
           setSearchContent(null);
+          alert('刷新')
           change();
         }}><ReloadOutlined />{intl.formatMessage({id: 'pages.refresh.text',})}</Button>
         <Search className={styles.extraContentSearch} placeholder=
@@ -211,24 +277,19 @@ export const BasicList = () => {
       notification.success({
         message: 'Delete timeseries ' + record.timeseries + ' success',
       });
-      refresh();
+      for(let i=0;i<currentItem.length;i++){
+        if(currentItem[i].timeseries==record.timeseries){
+          currentItem.splice(i,1);
+          setCurrentItem([]);
+          setCurrentItem(currentItem);
+          break;
+        }
+      }
     }else{
       notification.error({
         message: ret.message,
       });
     }
-  }
-
-  const refresh = async() => {
-    let ret = await showTimeseriesWithTenantUsingPOST({path:currentValue});
-    let ret2 = await showSchemaWithTenantUsingPOST();
-    let temp = ret.data;
-    if(searchTimeseriesContent != null && searchTimeseriesContent != ''){
-      temp =  temp.filter(item => item.timeseries.match(searchTimeseriesContent));
-    }
-    setCurrentItem(temp);
-    setCurrentValue(currentValue);
-    setEditable({});
   }
 
   return (
@@ -258,7 +319,7 @@ export const BasicList = () => {
                   actions={[
                     <a
                       key="edit"
-                      onClick={(e) => {showEditModal(e, item)}}
+                      onClick={(e) => {showEditModal(item.value)}}
                     >
                       {intl.formatMessage({id: 'createStorageGroup.timeseries.detail',})}
                     </a>,
@@ -296,11 +357,9 @@ export const BasicList = () => {
         visible={visible}
         current={currentItem}
         setCurrent={setCurrentItem}
-        currentSchema={currentSchema}
         currentValue={currentValue}
         onDone={handleDone}
         onDeleteItem={handleDeleteItem}
-        refresh={refresh}
         editable={editable}
         setEditable={setEditable}
         createable={createable}
@@ -309,6 +368,7 @@ export const BasicList = () => {
         searchContent={searchTimeseriesContent}
         setSearchContent={setSearchTimeseriesContent}
         searchTimeseries={searchTimeseries}
+        pageTimeseriesShowTotal={pageTimeseriesShowTotal}
       />
       <AddModal
         addModalVisible={addModalVisible}

@@ -551,6 +551,9 @@ export async function showSchemaWithTenantUsingPOST(
 /** showStorageWithTenant GET /api/iotdb/showStorage */
 export async function showStorageWithTenantUsingGET(
   params: {
+    // query
+    /** token */
+    token: string;
     // path
   },
   options?: { [key: string]: any },
@@ -558,7 +561,9 @@ export async function showStorageWithTenantUsingGET(
   const { ...queryParams } = params;
   return request<API.BaseVOObject_>('/api/iotdb/showStorage', {
     method: 'GET',
-    params: { ...queryParams },
+    params: {
+      ...queryParams,
+    },
     ...(options || {}),
   });
 }
@@ -566,6 +571,9 @@ export async function showStorageWithTenantUsingGET(
 /** showStorageWithTenant POST /api/iotdb/showStorage */
 export async function showStorageWithTenantUsingPOST(
   params: {
+    // query
+    /** token */
+    token: string;
     // path
   },
   options?: { [key: string]: any },
@@ -573,7 +581,49 @@ export async function showStorageWithTenantUsingPOST(
   const { ...queryParams } = params;
   return request<API.BaseVOObject_>('/api/iotdb/showStorage', {
     method: 'POST',
-    params: { ...queryParams },
+    params: {
+      ...queryParams,
+    },
+    ...(options || {}),
+  });
+}
+
+/** showStorageAppendWithTenant GET /api/iotdb/showStorageAppend */
+export async function showStorageAppendWithTenantUsingGET(
+  params: {
+    // query
+    /** token */
+    token: string;
+    // path
+  },
+  options?: { [key: string]: any },
+) {
+  const { ...queryParams } = params;
+  return request<API.BaseVOObject_>('/api/iotdb/showStorageAppend', {
+    method: 'GET',
+    params: {
+      ...queryParams,
+    },
+    ...(options || {}),
+  });
+}
+
+/** showStorageAppendWithTenant POST /api/iotdb/showStorageAppend */
+export async function showStorageAppendWithTenantUsingPOST(
+  params: {
+    // query
+    /** token */
+    token: string;
+    // path
+  },
+  options?: { [key: string]: any },
+) {
+  const { ...queryParams } = params;
+  return request<API.BaseVOObject_>('/api/iotdb/showStorageAppend', {
+    method: 'POST',
+    params: {
+      ...queryParams,
+    },
     ...(options || {}),
   });
 }
@@ -584,6 +634,8 @@ export async function showTimeseriesWithTenantUsingGET(
     // query
     /** path */
     path: string;
+    /** token */
+    token: string;
     // path
   },
   options?: { [key: string]: any },
@@ -604,12 +656,98 @@ export async function showTimeseriesWithTenantUsingPOST(
     // query
     /** path */
     path: string;
+    /** token */
+    token: string;
     // path
   },
   options?: { [key: string]: any },
 ) {
   const { ...queryParams } = params;
   return request<API.BaseVOObject_>('/api/iotdb/showTimeseries', {
+    method: 'POST',
+    params: {
+      ...queryParams,
+    },
+    ...(options || {}),
+  });
+}
+
+/** showTimeseriesAppendWithTenant GET /api/iotdb/showTimeseriesAppend */
+export async function showTimeseriesAppendWithTenantUsingGET(
+  params: {
+    // query
+    /** path */
+    path: string;
+    /** token */
+    token: string;
+    // path
+  },
+  options?: { [key: string]: any },
+) {
+  const { ...queryParams } = params;
+  return request<API.BaseVOObject_>('/api/iotdb/showTimeseriesAppend', {
+    method: 'GET',
+    params: {
+      ...queryParams,
+    },
+    ...(options || {}),
+  });
+}
+
+/** showTimeseriesAppendWithTenant POST /api/iotdb/showTimeseriesAppend */
+export async function showTimeseriesAppendWithTenantUsingPOST(
+  params: {
+    // query
+    /** path */
+    path: string;
+    /** token */
+    token: string;
+    // path
+  },
+  options?: { [key: string]: any },
+) {
+  const { ...queryParams } = params;
+  return request<API.BaseVOObject_>('/api/iotdb/showTimeseriesAppend', {
+    method: 'POST',
+    params: {
+      ...queryParams,
+    },
+    ...(options || {}),
+  });
+}
+
+/** showTimeseriesBakWithTenant GET /api/iotdb/showTimeseriesBak */
+export async function showTimeseriesBakWithTenantUsingGET(
+  params: {
+    // query
+    /** path */
+    path: string;
+    // path
+  },
+  options?: { [key: string]: any },
+) {
+  const { ...queryParams } = params;
+  return request<API.BaseVOObject_>('/api/iotdb/showTimeseriesBak', {
+    method: 'GET',
+    params: {
+      ...queryParams,
+    },
+    ...(options || {}),
+  });
+}
+
+/** showTimeseriesBakWithTenant POST /api/iotdb/showTimeseriesBak */
+export async function showTimeseriesBakWithTenantUsingPOST(
+  params: {
+    // query
+    /** path */
+    path: string;
+    // path
+  },
+  options?: { [key: string]: any },
+) {
+  const { ...queryParams } = params;
+  return request<API.BaseVOObject_>('/api/iotdb/showTimeseriesBak', {
     method: 'POST',
     params: {
       ...queryParams,

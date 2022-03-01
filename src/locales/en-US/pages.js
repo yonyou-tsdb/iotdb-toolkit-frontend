@@ -94,4 +94,6 @@ export default {
   'pages.connection-list.default.success': 'set to default success',
   'pages.connection-list.undefault': 'Set Undefault',
   'pages.connection-list.undefault.success': 'set to undefault success',
+  'pages.loading.complete': 'Loading Complete',
+  'pages.loading.continue': 'Continue Loading',
 };

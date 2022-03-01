@@ -91,4 +91,6 @@ export default {
   'pages.connection-list.default.success': '成功设为默认',
   'pages.connection-list.undefault': '取消默认',
   'pages.connection-list.undefault.success': '成功取消默认',
+  'pages.loading.complete': '加载完毕',
+  'pages.loading.continue': '继续加载',
 };
