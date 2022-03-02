@@ -6,12 +6,13 @@ import {Avatar, Button, Card, Col, Dropdown, Input, List, Menu, Modal, Progress,
 import { PageContainer } from '@ant-design/pro-layout';
 import { useRequest, useModel, useIntl } from 'umi';
 import moment from 'moment';
+import { v4 as uuid } from 'uuid';
 import OperationModal from './components/OperationModal';
 import AddUserModal from './components/AddUserModal';
 import EditUserModal from './components/EditUserModal';
 import { addFakeList, queryFakeList, removeFakeList, updateFakeList } from './service';
 import { listUserWithTenantUsingPOST, listPrivilegesWithTenantUsingPOST, changePrivilegesWithTenantUsingPOST,
-  showSchemaWithTenantUsingPOST, deleteUserWithTenantUsingPOST,
+  showSchemaWithTenantUsingPOST, deleteUserWithTenantUsingPOST, listPrivilegesAppendWithTenantUsingPOST,
  } from '@/services/swagger1/iotDbController';
 import styles from './style.less';
 const RadioButton = Radio.Button;
@@ -37,6 +38,7 @@ export const BasicList = () => {
   const [editUserVisible, setEditUserVisible] = useState(false);
   const [visible, setVisible] = useState(false);
   const [currentItem, setCurrentItem] = useState(undefined);
+  const [currentItemFiltered, setCurrentItemFiltered] = useState(undefined);
   const [currentSchema, setCurrentSchema] = useState(undefined);
   const [currentUser, setCurrentUser] = useState(undefined);
   const { initialState, setInitialState } = useModel('@@initialState');
@@ -46,6 +48,9 @@ export const BasicList = () => {
   const [editUser, setEditUser] = useState(undefined);
   const [createable, setCreateable] = useState(false);
   const [searchContent, setSearchContent] = useState(undefined);
+  const [pagePrivilegesHasMore, setPagePrivilegesHasMore] = useState(false);
+  const [pagePrivilegesToken, setPagePrivilegesToken] = useState(undefined);
+  const [privilegesSearchContent, setPrivilegesSearchContent] = useState(undefined);
   const {
     data: listData,
     loading,
@@ -58,12 +63,42 @@ export const BasicList = () => {
     showQuickJumper: true,
     pageSize: 10,
     current: initialState.manageUser_self_current===undefined?1:initialState.manageUser_self_current,
-    total: initialState.manageUser_self_totalCount===undefined?totalCount:initialState.manageUser_self_totalCount,
     onChange:(current, pageSize)=>{
       setInitialState({ ...initialState, manageUser_self_current: current,
        });
     },
   };
+  const pagePrivilegesShowTotal = (total) => {
+    return pagePrivilegesHasMore?
+    <a onClick = {pagePrivilegesAppend}>{intl.formatMessage({id: 'pages.loading.continue',})}</a>
+    :null;
+  }
+  const pagePrivilegesAppend = async() => {
+    const ret = await listPrivilegesAppendWithTenantUsingPOST({token:pagePrivilegesToken});
+    if(ret.code == '0'){
+      let messageJson = JSON.parse(ret.message || '{}');
+      setPagePrivilegesHasMore(messageJson.hasMore);
+      setPagePrivilegesToken(messageJson.token);
+      ret.data.filter((t)=>{ t.authOrigin=t.auth; })
+      let size = currentItem.length;
+      for(let i=0;i<ret.data.length;i++){
+        currentItem[size+i] = ret.data[i];
+      }
+      setCurrentItem([]);
+      setCurrentItem(currentItem);
+      setCurrentItemFiltered([]);
+      if(privilegesSearchContent != null && privilegesSearchContent != ''){
+        setCurrentItemFiltered(currentItem.filter(array =>
+          array.range.match(privilegesSearchContent)));
+      }else{
+        setCurrentItemFiltered(currentItem);
+      }
+    }else{
+      notification.error({
+        message: ret.message,
+      });
+    }
+  }
   const initUser = async(filter) => {
     let ret = await listUserWithTenantUsingPOST();
     if(ret.code == '0'){
@@ -95,19 +130,15 @@ export const BasicList = () => {
     }
   }
 
-  const showEditModal = async (e,item) => {
-    e.preventDefault();
-    let ret = await listPrivilegesWithTenantUsingPOST({user:item.user});
-    let ret2 = await showSchemaWithTenantUsingPOST();
-    if(ret.code=='0' && ret2.code=='0'){
-      setCurrentSchema(ret2.data);
-      setCurrentItem(ret.data);
+  const showEditModal = async (item) => {
+    let ret = await privilegesInit(item.user);
+    if(ret.code=='0'){
       setCurrentUser(item.user);
       setVisible(true);
-    }else{
-      notification.error({
-        message: ret.message,
-      });
+    }
+    let ret2 = await showSchemaWithTenantUsingPOST();
+    if(ret2.code=='0'){
+      setCurrentSchema(ret2.data);
     }
   };
 
@@ -122,9 +153,18 @@ export const BasicList = () => {
       setEditable({...editable});
     }else{
       editable[text.key]=false;
-      setEditable(editable);
       setEditable({...editable});
     }
+  }
+
+  const tosave = (text, editable, setEditable) => {
+    text.authOrigin = text.auth;
+    changeState(text, editable, setEditable);
+  }
+
+  const unsave = (text, editable, setEditable) => {
+    text.auth = text.authOrigin;
+    changeState(text, editable, setEditable);
   }
 
   const deleteUser = async (item) => {
@@ -201,7 +241,21 @@ export const BasicList = () => {
   const handleDeleteAuth = async(record) => {
     const ret = await changePrivilegesWithTenantUsingPOST({user:currentUser, range: record.range})
     if(ret.code == '0'){
-      refresh();
+      for(let i=0;i<currentItem.length;i++){
+        if(currentItem[i].range==record.range){
+          currentItem.splice(i,1);
+          setCurrentItem([]);
+          setCurrentItem(currentItem);
+          setCurrentItemFiltered([]);
+          if(privilegesSearchContent != null && privilegesSearchContent != ''){
+            setCurrentItemFiltered(currentItem.filter(array =>
+              array.range.match(privilegesSearchContent)));
+          }else{
+            setCurrentItemFiltered(currentItem);
+          }
+          break;
+        }
+      }
     }else{
       notification.error({
         message: ret.message,
@@ -212,7 +266,8 @@ export const BasicList = () => {
   const handleSaveAuth = async(record,e) => {
     const ret = await changePrivilegesWithTenantUsingPOST({user:currentUser, auth:record.auth, range: record.range})
     if(ret.code == '0'){
-      refresh();
+      editable[record.key]=false;
+      setEditable({...editable});
     }else{
       notification.error({
         message: ret.message,
@@ -220,12 +275,29 @@ export const BasicList = () => {
     }
   }
 
-  const refresh = async() => {
-    let ret = await listPrivilegesWithTenantUsingPOST({user:currentUser});
-    let ret2 = await showSchemaWithTenantUsingPOST();
-    setCurrentItem(ret.data);
-    setCurrentUser(currentUser);
-    setEditable({});
+  const privilegesInit = async(user) => {
+    setPrivilegesSearchContent(null);
+    let token = uuid().replaceAll('-','');
+    let ret = await listPrivilegesWithTenantUsingPOST({user:user==null?currentUser:user,
+      token:token});
+    if(ret.code=='0'){
+      let messageJson = JSON.parse(ret.message || '{}');
+      setPagePrivilegesHasMore(messageJson.hasMore);
+      setPagePrivilegesToken(messageJson.token);
+      ret.data.filter((t)=>{ t.authOrigin=t.auth; })
+      setCurrentItem(ret.data);
+      setCurrentItemFiltered(ret.data);
+    }else{
+      notification.error({
+        message: ret.message,
+      });
+    }
+    return ret;
+  }
+
+  const privilegesSearch = async(value) => {
+    setCurrentItemFiltered([]);
+    setCurrentItemFiltered(currentItem.filter(array => array.range.match(value)));
   }
 
   return (
@@ -255,7 +327,7 @@ export const BasicList = () => {
                   actions={[
                     <a
                       key="edit"
-                      onClick={(e) => {showEditModal(e, item)}}
+                      onClick={() => {showEditModal(item)}}
                     >
                       {intl.formatMessage({id: 'manageUser.privilege.detail',})}
                     </a>,
@@ -290,17 +362,27 @@ export const BasicList = () => {
         doneResultTitle={doneResultTitle}
         visible={visible}
         current={currentItem}
+        currentFiltered={currentItemFiltered}
+        setCurrentFiltered={setCurrentItemFiltered}
         currentSchema={currentSchema}
         currentUser={currentUser}
         onDone={handleDone}
         onSaveAuth={handleSaveAuth}
         onDeleteAuth={handleDeleteAuth}
-        refresh={refresh}
         editable={editable}
         setEditable={setEditable}
         createable={createable}
         setCreateable={setCreateable}
         changeState={changeState}
+        tosave={tosave}
+        unsave={unsave}
+        pagePrivilegesShowTotal={pagePrivilegesShowTotal}
+        pagePrivilegesHasMore={pagePrivilegesHasMore}
+        pagePrivilegesAppend={pagePrivilegesAppend}
+        refresh={privilegesInit}
+        search={privilegesSearch}
+        searchContent={privilegesSearchContent}
+        setSearchContent={setPrivilegesSearchContent}
       />
       <AddUserModal
         addUserVisible={addUserVisible}

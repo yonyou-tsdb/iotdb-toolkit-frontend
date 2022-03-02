@@ -27,6 +27,7 @@ export const BasicList = () => {
   const [editModalVisible, setEditModalVisible] = useState(false);
   const [visible, setVisible] = useState(false);
   const [currentItem, setCurrentItem] = useState(undefined);
+  const [currentItemFiltered, setCurrentItemFiltered] = useState(undefined);
   const [currentValue, setCurrentValue] = useState(undefined);
   const { initialState, setInitialState } = useModel('@@initialState');
   const [doneResultStatus, setDoneResultStatus] = useState(undefined);
@@ -40,7 +41,7 @@ export const BasicList = () => {
   const [pageStorageGroupToken, setPageStorageGroupToken] = useState(undefined);
   const [pageTimeseriesHasMore, setPageTimeseriesHasMore] = useState(false);
   const [pageTimeseriesToken, setPageTimeseriesToken] = useState(undefined);
-  const { getStringFromMillisecond } = DateUtil;
+  const { getStringFromMillisecond, getMillisecondFromTimeunit } = DateUtil;
   const {
     data: listData,
     loading,
@@ -55,7 +56,6 @@ export const BasicList = () => {
       </div>
     </div>
   );
-  let totalCount = listData?.length || 1;
   const pageStorageGroupShowTotal = (total) => {
     return pageStorageGroupHasMore?
     <a onClick = {pageStorageGroupAppend}>{intl.formatMessage({id: 'pages.loading.continue',})}</a>
@@ -78,7 +78,6 @@ export const BasicList = () => {
         initialState.manageStorage_self = initialState.manageStorage_self_total;
       }
       setInitialState({ ...initialState, manageStorage_self: initialState.manageStorage_self,
-        manageStorage_self_totalCount: initialState.manageStorage_self.length,
         manageStorage_self_total: initialState.manageStorage_self_total, });
     }else{
       notification.error({
@@ -109,12 +108,12 @@ export const BasicList = () => {
       });
     }
   }
+  let totalCount = listData?.length || 1;
   let paginationProps = {
     showTotal: pageStorageGroupShowTotal,
     showQuickJumper: true,
     pageSize: 10,
     current: initialState.manageStorage_self_current===undefined?1:initialState.manageStorage_self_current,
-    total: initialState.manageStorage_self_totalCount===undefined?totalCount:initialState.manageStorage_self_totalCount,
     onChange:(current, pageSize)=>{
       setInitialState({ ...initialState, manageStorage_self_current: current,
        });
@@ -131,8 +130,7 @@ export const BasicList = () => {
         ret.data = ret.data.filter(array => array.value.match(filter));
       }
       setInitialState({ ...initialState, manageStorage_self: ret.data,
-        manageStorage_self_totalCount: ret.data.length, manageStorage_self_current: 1,
-        manageStorage_self_total: ret.data, });
+        manageStorage_self_current: 1, manageStorage_self_total: ret.data, });
     }else{
       notification.error({
         message: ret.message,
@@ -145,7 +143,6 @@ export const BasicList = () => {
         data = data.filter(array => array.value.match(filter));
       }
       setInitialState({ ...initialState, manageStorage_self: data,
-        manageStorage_self_totalCount: data.length,
         manageStorage_self_current: 1,
       });
   }
@@ -202,7 +199,21 @@ export const BasicList = () => {
   const deleteItem = async (item) => {
     const ret = await deleteStorageGroupWithTenantUsingPOST({name:item.value});
     if(ret.code == '0'){
-      initItem(searchContent);
+      // initItem(searchContent);
+      for(let i=0;i<initialState.manageStorage_self.length;i++){
+        if(initialState.manageStorage_self[i].value==item.value){
+          initialState.manageStorage_self.splice(i,1);
+          break;
+        }
+      }
+      for(let i=0;i<initialState.manageStorage_self_total.length;i++){
+        if(initialState.manageStorage_self_total[i].value==item.value){
+          initialState.manageStorage_self_total.splice(i,1);
+          break;
+        }
+      }
+      setInitialState({ ...initialState, manageStorage_self: initialState.manageStorage_self,
+        manageStorage_self_total: initialState.manageStorage_self_total, });
       notification.success({
         message: 'Delete Storage Group ' + item.value + ' Success',
       });
@@ -217,8 +228,7 @@ export const BasicList = () => {
     <Button.Group>
         <Button value="all" onClick={() => {
           setSearchContent(null);
-          alert('刷新')
-          change();
+          initItem();
         }}><ReloadOutlined />{intl.formatMessage({id: 'pages.refresh.text',})}</Button>
         <Search className={styles.extraContentSearch} placeholder=
           {intl.formatMessage({id: 'pages.refresh.placeholder',})} onSearch={(value) => {
@@ -258,6 +268,27 @@ export const BasicList = () => {
       </a>
     </Dropdown>
   );
+
+  const handAddDone = (value) => {
+    let newSG = {timeseriesCount:0, value: 'root.'+value.name, key: uuid().replaceAll('-',''),
+      ttl: getMillisecondFromTimeunit(value.ttl,value.timeunit),
+    };
+    let l = initialState.manageStorage_self_total.length;
+    initialState.manageStorage_self_total[l] = newSG;
+    setInitialState({ ...initialState,
+      manageStorage_self_total: initialState.manageStorage_self_total, });
+  }
+
+  const handEditDone = (item) => {
+    for(let i=0;i<initialState.manageStorage_self_total.length;i++){
+      if(initialState.manageStorage_self_total[i].value==item.name){
+        initialState.manageStorage_self_total[i].ttl = getMillisecondFromTimeunit(item.ttl,item.timeunit);
+        setInitialState({ ...initialState,
+          manageStorage_self_total: initialState.manageStorage_self_total, });
+        break;
+      }
+    }
+  }
 
   const handleDone = () => {
     if(doneResultStatus==='success'){
@@ -357,6 +388,8 @@ export const BasicList = () => {
         visible={visible}
         current={currentItem}
         setCurrent={setCurrentItem}
+        currentFiltered={currentItemFiltered}
+        setCurrentFiltered={setCurrentItemFiltered}
         currentValue={currentValue}
         onDone={handleDone}
         onDeleteItem={handleDeleteItem}
@@ -375,6 +408,7 @@ export const BasicList = () => {
         setAddModalVisible={setAddModalVisible}
         initItem={initItem}
         searchContent={searchContent}
+        onDone={handAddDone}
       />
       <EditStorageModal
         editModalVisible={editModalVisible}
@@ -382,6 +416,7 @@ export const BasicList = () => {
         editItem={editItem}
         initItem={initItem}
         searchContent={searchContent}
+        onDone={handEditDone}
       />
     </div>
   );

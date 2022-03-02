@@ -296,7 +296,7 @@ const OperationModal = (props) => {
       <Button.Group>
         <Button value="all" onClick={() => {
           setSearchContent(null);
-          searchTimeseries(currentValue,null);
+          searchTimeseries(currentValue,'');
         }}><ReloadOutlined />{intl.formatMessage({id: 'pages.refresh.text',})}</Button>
         <Input.Search
           style={{width: '220px'}}

@@ -16,7 +16,7 @@ import { editStorageGroupWithTenantUsingPOST } from '@/services/swagger1/iotDbCo
 const EditStorageModal = (props) => {
   const intl = useIntl();
   const { getStringFromMillisecond, getMillisecondFromTimeunit } = DateUtil;
-  const { editModalVisible, setEditModalVisible, editItem, initItem, searchContent } = props;
+  const { editModalVisible, setEditModalVisible, editItem, initItem, searchContent, onDone } = props;
   const [form] = Form.useForm();
   if (!editModalVisible) {
     return null;
@@ -45,7 +45,8 @@ const EditStorageModal = (props) => {
           }
           let ret = await editStorageGroupWithTenantUsingPOST({name:editItem.value, ttl: ttl});
           if(ret.code == '0'){
-            initItem(searchContent);
+            console.log(values);
+            onDone({name:editItem.value, ...values});
             notification.success({
               message: 'Edit Storage Group ' + editItem.value + ' Success',
             });

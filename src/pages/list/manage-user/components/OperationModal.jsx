@@ -8,13 +8,18 @@ import {
 } from '@ant-design/pro-form';
 import React, { useState } from 'react';
 import styles from '../style.less';
-import { Button, Result, Table, Tag, Space, Checkbox, Popover, Modal, Popconfirm, Select, Form, notification } from 'antd';
+import { Button, Result, Table, Tag, Space, Checkbox, Popover, Modal, Popconfirm, Select, Form,
+  notification, Input } from 'antd';
+import { ReloadOutlined, CloseCircleFilled } from '@ant-design/icons';
 import { useRequest, useModel, useIntl } from 'umi';
 import { addPrivilegesWithTenantUsingPOST } from '@/services/swagger1/iotDbController';
+const { Search } = Input;
 const OperationModal = (props) => {
   const intl = useIntl();
-  const { done, visible, current, onDone, children, editable, setEditable, changeState, createable, setCreateable,
-    onSaveAuth, onDeleteAuth, refresh, currentSchema, currentUser } = props;
+  const { done, visible, current, onDone, children, editable, setEditable, changeState,
+    createable, setCreateable, onSaveAuth, onDeleteAuth, currentSchema, currentUser, tosave,
+    unsave, pagePrivilegesShowTotal, pagePrivilegesHasMore, pagePrivilegesAppend,
+    currentFiltered, setCurrentFiltered, refresh, search, searchContent, setSearchContent } = props;
   const { initialState, setInitialState } = useModel('@@initialState');
   const authConnectionOptions = ['SET_STORAGE_GROUP','INSERT_TIMESERIES','READ_TIMESERIES','CREATE_TIMESERIES',
 'DELETE_TIMESERIES','CREATE_USER','DELETE_USER','MODIFY_PASSWORD','LIST_USER','GRANT_USER_PRIVILEGE',
@@ -29,6 +34,7 @@ const OperationModal = (props) => {
   const [physical, setPhysical] = React.useState(undefined);
   const [selectedPhysical, setSelectedPhysical] = React.useState(undefined);
   const [addAuth, setAddAuth] = React.useState(undefined);
+  // const [searchContent, setSearchContent] = React.useState(undefined);
   const handleProvinceChange = value => {
     setSelectedSg(value);
     setEntities(currentSchema[1][value]);
@@ -64,7 +70,9 @@ const OperationModal = (props) => {
       let ret = await addPrivilegesWithTenantUsingPOST({user:currentUser, auth:addAuth,
         sg:selectedSg, entity:selectedEntity, physical:selectedPhysical});
       if(ret.code == '0'){
-        refresh();
+        notification.success({
+          message: 'success',
+        });
       }else{
         notification.error({
           message: ret.message,
@@ -133,12 +141,12 @@ const OperationModal = (props) => {
               onSaveAuth(record,e)
           }}>{intl.formatMessage({id: 'pages.save.text',})}</a>):(
             <a onClick={(e) => {
-              changeState(text, editable, setEditable)
+              tosave(text, editable, setEditable)
           }}>{intl.formatMessage({id: 'pages.edit.text',})}</a>)}
 
           {editable[record.key]==true?(
             <a onClick={(e) => {
-              changeState(text, editable, setEditable)
+              unsave(text, editable, setEditable)
             }}>{intl.formatMessage({id: 'pages.cancel.text',})}</a>
           ):(<Popconfirm placement="left" title={record.range + " -- "
                + intl.formatMessage({id: 'manageUser.privilege.delete.confirm',})}
@@ -346,7 +354,6 @@ const OperationModal = (props) => {
       form={form}
       title={intl.formatMessage({id: 'manageUser.privilege.detail',}) + ' -- ' + currentUser }
       className={styles.standardListForm}
-      initialValues={current}
       submitter={{
         submitButtonProps: {
           style: {
@@ -387,7 +394,29 @@ const OperationModal = (props) => {
           : {},
       }}
     >
-      <Table columns={columns} dataSource={current} pagination={{pageSize:10}}/>
+    <div style={{textAlign: 'right', marginBottom: '10px', marginTop: '-10px'}}>
+      <Button.Group>
+        <Button value="all" onClick={() => {
+          refresh();
+        }}><ReloadOutlined />{intl.formatMessage({id: 'pages.refresh.text',})}</Button>
+        <Search className={styles.extraContentSearch} placeholder=
+          {intl.formatMessage({id: 'pages.refresh.placeholder',})} onSearch={(value) => {
+          search(value);
+        }} onChange={(e) => {setSearchContent(e.target.value);}}
+          value={searchContent}
+          suffix={
+              (searchContent==null||searchContent=='')?
+              <CloseCircleFilled style={{ display: 'none' }} />:
+              <CloseCircleFilled style={{ color: 'rgba(0,0,0,.45)' }} onClick={() => {setSearchContent(null)}}/>
+          }
+        />
+      </Button.Group>
+    </div>
+      <Table columns={columns} dataSource={currentFiltered} pagination={{
+        pageSize: 10,
+        showQuickJumper: true,
+        showTotal: pagePrivilegesShowTotal,
+      }}/>
       {createable==true?(
         <Table columns={columns2} dataSource={[{key:null,granularity2:null,auth2:null}]} pagination={{hideOnSinglePage:true}} />
       ):null}

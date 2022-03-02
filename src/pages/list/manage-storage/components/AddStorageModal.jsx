@@ -14,7 +14,7 @@ import DateUtil from '../../../../utils/DateUtil';
 import { addStorageGroupWithTenantUsingPOST } from '@/services/swagger1/iotDbController';
 const AddStorageModal = (props) => {
   const intl = useIntl();
-  const { addModalVisible, setAddModalVisible, initItem, searchContent } = props;
+  const { addModalVisible, setAddModalVisible, initItem, searchContent, onDone, } = props;
   const { getMillisecondFromTimeunit } = DateUtil;
   const [form] = Form.useForm();
   if (!addModalVisible) {
@@ -44,7 +44,7 @@ const AddStorageModal = (props) => {
           }
           let ret = await addStorageGroupWithTenantUsingPOST({name:'root.' + values.name, ttl: ttl});
           if(ret.code == '0'){
-            initItem(searchContent);
+            onDone(values);
             notification.success({
               message: 'Add Storage Group root.' + values.name + ' Success',
             });
