@@ -32,21 +32,6 @@ export async function currentUserUsingPOST(
   });
 }
 
-/** heartBeat POST /api/heartBeat */
-export async function heartBeatUsingPOST(
-  params: {
-    // path
-  },
-  options?: { [key: string]: any },
-) {
-  const { ...queryParams } = params;
-  return request<API.BaseVOObject_>('/api/heartBeat', {
-    method: 'POST',
-    params: { ...queryParams },
-    ...(options || {}),
-  });
-}
-
 /** /api/login/account /api/login/account GET /api/login/account */
 export async function loginAccountUsingGET(
   params: {

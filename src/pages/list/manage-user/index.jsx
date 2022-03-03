@@ -39,7 +39,6 @@ export const BasicList = () => {
   const [visible, setVisible] = useState(false);
   const [currentItem, setCurrentItem] = useState(undefined);
   const [currentItemFiltered, setCurrentItemFiltered] = useState(undefined);
-  const [currentSchema, setCurrentSchema] = useState(undefined);
   const [currentUser, setCurrentUser] = useState(undefined);
   const { initialState, setInitialState } = useModel('@@initialState');
   const [doneResultStatus, setDoneResultStatus] = useState(undefined);
@@ -136,10 +135,6 @@ export const BasicList = () => {
       setCurrentUser(item.user);
       setVisible(true);
     }
-    let ret2 = await showSchemaWithTenantUsingPOST();
-    if(ret2.code=='0'){
-      setCurrentSchema(ret2.data);
-    }
   };
 
   const showAddUserModal = (e) => {
@@ -232,7 +227,7 @@ export const BasicList = () => {
     }
     setDone(false);
     setVisible(false);
-    setCurrentItem({});
+    setCurrentItem([]);
     setCurrentUser(null);
     setEditable({});
     setCreateable(false);
@@ -300,6 +295,26 @@ export const BasicList = () => {
     setCurrentItemFiltered(currentItem.filter(array => array.range.match(value)));
   }
 
+  const addPrivilegesDone = (json) => {
+    for(let i=0;i<currentItem.length;i++){
+      if(currentItem[i].range==json.range){
+        currentItem[i].auth.push.apply(currentItem[i].auth,json.success);
+        currentItem[i].authOrigin.push.apply(currentItem[i].authOrigin,json.success);
+        currentItem[i].auth = currentItem[i].auth.reduce(function (prev, cur) {
+            prev.indexOf(cur) === -1 && prev.push(cur);
+            return prev;
+        },[]);
+        currentItem[i].authOrigin = currentItem[i].authOrigin.reduce(function (prev, cur) {
+            prev.indexOf(cur) === -1 && prev.push(cur);
+            return prev;
+        },[]);
+        setCurrentItem([]);
+        setCurrentItem(currentItem);
+        break;
+      }
+    }
+  }
+
   return (
     <div>
       <PageContainer title={initialState.activeConnectionDesc}>
@@ -364,7 +379,6 @@ export const BasicList = () => {
         current={currentItem}
         currentFiltered={currentItemFiltered}
         setCurrentFiltered={setCurrentItemFiltered}
-        currentSchema={currentSchema}
         currentUser={currentUser}
         onDone={handleDone}
         onSaveAuth={handleSaveAuth}
@@ -383,6 +397,7 @@ export const BasicList = () => {
         search={privilegesSearch}
         searchContent={privilegesSearchContent}
         setSearchContent={setPrivilegesSearchContent}
+        onAddDone={addPrivilegesDone}
       />
       <AddUserModal
         addUserVisible={addUserVisible}

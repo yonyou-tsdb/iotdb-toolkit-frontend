@@ -14,7 +14,9 @@ export default {
   'manageUser.privilege.granularity.storageGroup.required': 'Storage Group Required',
   'manageUser.privilege.granularity.entity': 'Entity',
   'manageUser.privilege.granularity.entity.required': 'Entity Required',
-  'manageUser.privilege.granularity.physical': 'Physical',
-  'manageUser.privilege.granularity.physical.required': 'Physical Required',
+  'manageUser.privilege.granularity.physical': 'Measurement',
+  'manageUser.privilege.granularity.physical.required': 'Measurement Required',
+  'manageUser.privilege.granularity.timeseries': 'Timeseries',
+  'manageUser.privilege.granularity.timeseries.required': 'Timeseries Required',
   'manageUser.edit.title': 'Edit User',
 }

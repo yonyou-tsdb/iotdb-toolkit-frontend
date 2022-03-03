@@ -10,7 +10,6 @@ import DataSourceDropdown from './DataSourceDropdown';
 import HeaderSearch from '../HeaderSearch';
 import styles from './index.less';
 import { connectionTestUsingPOST, connectionAddThenReturnLessUsingPOST, } from '@/services/swagger1/connectionController';
-import { heartBeatUsingPOST, } from '@/services/swagger1/userController';
 import CookieUtil from '../../utils/CookieUtil';
 import HeaderDropdown from '../HeaderDropdown';
 const { getItem, addItem } = CookieUtil;

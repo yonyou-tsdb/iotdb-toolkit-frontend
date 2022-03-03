@@ -17,9 +17,10 @@ const { Search } = Input;
 const OperationModal = (props) => {
   const intl = useIntl();
   const { done, visible, current, onDone, children, editable, setEditable, changeState,
-    createable, setCreateable, onSaveAuth, onDeleteAuth, currentSchema, currentUser, tosave,
+    createable, setCreateable, onSaveAuth, onDeleteAuth, currentUser, tosave,
     unsave, pagePrivilegesShowTotal, pagePrivilegesHasMore, pagePrivilegesAppend,
-    currentFiltered, setCurrentFiltered, refresh, search, searchContent, setSearchContent } = props;
+    currentFiltered, setCurrentFiltered, refresh, search, searchContent, setSearchContent,
+    onAddDone, } = props;
   const { initialState, setInitialState } = useModel('@@initialState');
   const authConnectionOptions = ['SET_STORAGE_GROUP','INSERT_TIMESERIES','READ_TIMESERIES','CREATE_TIMESERIES',
 'DELETE_TIMESERIES','CREATE_USER','DELETE_USER','MODIFY_PASSWORD','LIST_USER','GRANT_USER_PRIVILEGE',
@@ -28,39 +29,13 @@ const OperationModal = (props) => {
   const { Option } = Select;
   const [form] = Form.useForm();
   const [selectedGranularity, setSelectedGranularity] = React.useState(undefined);
-  const [selectedSg, setSelectedSg] = React.useState(undefined);
-  const [entities, setEntities] = React.useState(undefined);
-  const [selectedEntity, setSelectedEntity] = React.useState(undefined);
-  const [physical, setPhysical] = React.useState(undefined);
-  const [selectedPhysical, setSelectedPhysical] = React.useState(undefined);
+  const [timeseries, setTimeseries] = React.useState(undefined);
   const [addAuth, setAddAuth] = React.useState(undefined);
-  // const [searchContent, setSearchContent] = React.useState(undefined);
-  const handleProvinceChange = value => {
-    setSelectedSg(value);
-    setEntities(currentSchema[1][value]);
-    setSelectedEntity([]);
-    setPhysical([])
-    setSelectedPhysical([]);
-    setAddAuth([]);
-  };
 
   const onGranularityChange = value => {
-    setSelectedSg([]);
-    setEntities(currentSchema[1][value]);
-    setSelectedEntity([]);
-    setPhysical([])
-    setSelectedPhysical([]);
+    setTimeseries(null);
+    setAddAuth(null);
     setSelectedGranularity(value);
-  };
-
-  const onEntityChange = value => {
-    setSelectedEntity(value);
-    setPhysical(currentSchema[2][value]);
-    setSelectedPhysical([]);
-  };
-
-  const onPhysicalChange = value => {
-    setSelectedPhysical(value);
   };
 
   const addPrivileges = async(text,record,form) => {
@@ -68,10 +43,12 @@ const OperationModal = (props) => {
       await form.validateFields();
       let range = 'root';
       let ret = await addPrivilegesWithTenantUsingPOST({user:currentUser, auth:addAuth,
-        sg:selectedSg, entity:selectedEntity, physical:selectedPhysical});
+        timeseries:timeseries});
       if(ret.code == '0'){
+        let messageJson = JSON.parse(ret.message || '{}');
+        onAddDone(messageJson);
         notification.success({
-          message: 'success',
+          message: messageJson.range + ' add "' + messageJson.success + '" success',
         });
       }else{
         notification.error({
@@ -115,7 +92,7 @@ const OperationModal = (props) => {
         return editable[record.key]==true ? (
           <>
             <Checkbox.Group defaultValue={tags} options={
-                record.granularity == '数据连接'?authConnectionOptions:authMeasureOptions
+                record.range == 'root'?authConnectionOptions:authMeasureOptions
               } onChange={(e)=>{record.auth=e;}}/>
           </>
           ) : (
@@ -178,16 +155,8 @@ const OperationModal = (props) => {
               value: 'connection',
             },
             {
-              label: intl.formatMessage({id: 'manageUser.privilege.granularity.storageGroup',}),
-              value: 'storage',
-            },
-            {
-              label: intl.formatMessage({id: 'manageUser.privilege.granularity.entity',}),
-              value: 'entity',
-            },
-            {
-              label: intl.formatMessage({id: 'manageUser.privilege.granularity.physical',}),
-              value: 'physical',
+              label: intl.formatMessage({id: 'manageUser.privilege.granularity.timeseries',}),
+              value: 'timeseries',
             },
           ]}
           fieldProps={{onChange:(val) => {onGranularityChange(val);record2.granularity2=val;},
@@ -201,93 +170,28 @@ const OperationModal = (props) => {
       title: intl.formatMessage({id: 'manageUser.privilege.range',}),
       dataIndex: 'range2',
       key: 'range2',
-      render: text => selectedGranularity=='physical'?(
-        <>
-          <ProFormSelect options={currentSchema[0]}
-          name="sg2"
+      render: (text, record2) => selectedGranularity=='timeseries'?(
+        <ProFormText
+          name="range2"
           rules={[
             {
               required: true,
-              message: intl.formatMessage({id:
-                'manageUser.privilege.granularity.storageGroup.required',}),
+              message: 'Between 1 to 255 character',
+              max: 255,
+              type: 'string',
             },
-          ]}
-          fieldProps={{onChange:(val) => handleProvinceChange(val),
-            defaultValue:null,value:selectedSg,
-            style:{ width: 150 }
-          }}  />
-          <ProFormSelect options={entities}
-          name="entity2"
-          rules={[
             {
-              required: true,
-              message: intl.formatMessage({id:
-                'manageUser.privilege.granularity.entity.required',}),
+              pattern: /^(?!\.)[a-zA-Z0-9.\u4e00-\u9fa5_]+$/,
+              message: intl.formatMessage({id: 'createStorageGroup.entity.rule',}),
             },
           ]}
-          fieldProps={{onChange:(val) => {onEntityChange(val)},
-            value:selectedEntity,
-            style:{ width: 150 }
-          }} />
-          <ProFormSelect options={physical} mode="multiple"
-          name="physical2"
-          rules={[
-            {
-              required: true,
-              message: intl.formatMessage({id:
-                'manageUser.privilege.granularity.physical.required',}),
-            },
-          ]}
-          fieldProps={{onChange:(val) => {onPhysicalChange(val)},
-            value:selectedPhysical,
-            style:{ width: 150 }
-          }} />
-        </>
-      ):selectedGranularity=='entity'?(
-        <>
-          <ProFormSelect options={currentSchema[0]}
-          name="sg3"
-          rules={[
-            {
-              required: true,
-              message: intl.formatMessage({id:
-                'manageUser.privilege.granularity.storageGroup.required',}),
-            },
-          ]}
-          fieldProps={{onChange:(val) => handleProvinceChange(val),
-            defaultValue:null,value:selectedSg,
-            style:{ width: 150 }
-          }}  />
-          <ProFormSelect options={entities} mode="multiple"
-          name="entity3"
-          rules={[
-            {
-              required: true,
-              message: intl.formatMessage({id:
-                'manageUser.privilege.granularity.entity.required',}),
-            },
-          ]}
-          fieldProps={{onChange:(val) => {onEntityChange(val)},
-            value:selectedEntity,
-            style:{ width: 150 }
-          }} />
-        </>
-      ):selectedGranularity=='storage'?(
-        <>
-          <ProFormSelect options={currentSchema[0]} mode="multiple"
-          name="sg4"
-          rules={[
-            {
-              required: true,
-              message: intl.formatMessage({id:
-                'manageUser.privilege.granularity.storageGroup.required',}),
-            },
-          ]}
-          fieldProps={{onChange:(val) => handleProvinceChange(val),
-            value:selectedSg,
-            style:{ width: 150 }
-          }}  />
-        </>
+          onChange={(e)=>{setTimeseries(e.target.value);}}
+          fieldProps={{
+            value: timeseries,
+            addonBefore: 'root.',
+            style:{ width: 300 },
+          }}
+        />
       ):null
     },
     {
@@ -366,11 +270,7 @@ const OperationModal = (props) => {
               key="add"
               onClick={() => {
                 setSelectedGranularity(null);
-                setSelectedSg([]);
-                setEntities([]);
-                setSelectedEntity([]);
-                setPhysical([])
-                setSelectedPhysical([]);
+                setTimeseries(null);
                 setAddAuth([]);
                 setCreateable(!createable);
               }}
