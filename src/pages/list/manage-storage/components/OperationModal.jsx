@@ -25,19 +25,7 @@ const OperationModal = (props) => {
     'DOUBLE':['PLAIN', 'RLE', 'TS_2DIFF', 'GORILLA'], 'TEXT':['PLAIN']};
   const { Option } = Select;
   const [form, form2] = Form.useForm();
-  const [selectedGranularity, setSelectedGranularity] = React.useState(undefined);
-  const [selectedSg, setSelectedSg] = React.useState(undefined);
-  const [entities, setEntities] = React.useState(undefined);
-  const [selectedEntity, setSelectedEntity] = React.useState(undefined);
-  const [physical, setPhysical] = React.useState(undefined);
-  const [selectedPhysical, setSelectedPhysical] = React.useState(undefined);
-  const [addAuth, setAddAuth] = React.useState(undefined);
   const [dataType2, setDataType2] = React.useState(undefined);
-
-  const onPhysicalChange = value => {
-    setSelectedPhysical(value);
-  };
-
   const addTimeseries = async(text,record,form) => {
     try {
       await form.validateFields();
@@ -263,13 +251,6 @@ const OperationModal = (props) => {
             <Button
               key="add"
               onClick={() => {
-                setSelectedGranularity(null);
-                setSelectedSg([]);
-                setEntities([]);
-                setSelectedEntity([]);
-                setPhysical([])
-                setSelectedPhysical([]);
-                setAddAuth([]);
                 setCreateable(!createable);
               }}
             >

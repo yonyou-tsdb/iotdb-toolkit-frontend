@@ -5,6 +5,7 @@ import React, { useRef, useEffect, useContext, createContext, useReducer, useSta
 import { throttle, isNumber } from 'lodash-es'
 import {Typography, Form, Input, InputNumber, Popconfirm, Table, notification, Button ,Tooltip,
  Divider} from 'antd';
+import moment from "moment";
 enum dispatchType {
   INITHEIGHT = 'INITHEIGHT',
   RENDERTR = 'RENDERTR',
@@ -303,7 +304,7 @@ const VTable = (props: any): JSX.Element => {
 
 const BuildEditableTable = (props) => {
   const { columns, scroll, sticky, pagination, editingKey, setEditingKey, form, updatePoint, data,
-    setData, active, rowKey, clearEditable, wrapTableRef } = props;
+    setData, active, rowKey, clearEditable, wrapTableRef, timeDisplayForm } = props;
   const isEditing = (record) => record[rowKey] === editingKey;
   const [isChange, setChange] = useState({});
   const inputRef = React.useRef<any>(null);
@@ -428,7 +429,8 @@ const BuildEditableTable = (props) => {
           </span>
         ) : (
           <span>
-          {data[active][record.index-1].Time}
+          {timeDisplayForm[active]=='utc'?moment(parseInt(data[active][record.index-1].Time)).
+          utc().format('YYYY-MM-DD HH:mm:ss.SSS') : data[active][record.index-1].Time}
           <div>
             <Typography.Link onClick={() => onEdit(record)}>
               edit

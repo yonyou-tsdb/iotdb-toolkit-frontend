@@ -36,4 +36,5 @@ export default {
   'query.result.cost.text': 'cost',
   'query.result.return.text': 'return',
   'query.result.return.rows': 'rows',
+  'query.result.time.displayAs': 'Time display as',
 }

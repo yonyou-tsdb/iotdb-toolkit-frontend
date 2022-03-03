@@ -2,7 +2,7 @@ import {DingdingOutlined, DownOutlined, EllipsisOutlined, InfoCircleOutlined, Pl
   SaveOutlined, PauseCircleOutlined, PlusCircleOutlined, CloseCircleOutlined, FileSearchOutlined,
   ExportOutlined, ImportOutlined, SearchOutlined,} from '@ant-design/icons';
 import {Badge, Button, Card, Statistic, Descriptions, Divider, Dropdown, Menu, Popover, Table, Tooltip, Empty,
-  notification, Upload, Typography, Form, Input, InputNumber, Popconfirm,} from 'antd';
+  notification, Upload, Typography, Form, Input, InputNumber, Popconfirm, Select } from 'antd';
 import { GridContent, PageContainer, RouteContext } from '@ant-design/pro-layout';
 import React, { Fragment, useEffect, useState, useRef } from 'react';
 import { useRequest, useModel, useIntl } from 'umi';
@@ -88,6 +88,7 @@ const Self = () => {
   }, [resultData])
   const [resultSize, setResultSize] = useState([]);
   const [resultTimeCost, setResultTimeCost] = useState([]);
+  const [timeDisplayForm, setTimeDisplayForm] = useState([]);
   const [queryToken, setQueryToken] = useState([]);
   const [columns, setColumns] = useState([{}]);
   const [editingKey, setEditingKey] = useState('');
@@ -111,7 +112,18 @@ const Self = () => {
      addonAfter={
       <a onClick={()=>{resultLocateTo()}} ><SearchOutlined /></a>
     } />
+    <Divider type="vertical" />
+    <Select placeholder={intl.formatMessage({id: 'query.result.time.displayAs',})}
+      style={{ width:140 }} onChange={(v)=>{changeTimeDisplayForm(v)}}
+     >
+      <Option value="number">Number</Option>
+      <Option value="utc">UTC</Option>
+    </Select>
     </>;
+  const changeTimeDisplayForm = (v) => {
+    timeDisplayForm[activeQueryTabkey] = v;
+    setTimeDisplayForm({...timeDisplayForm});
+  }
   const resultLocateTo = () => {
     let index = resultLocatorValue[activeQueryTabkey]==null?0:resultLocatorValue[activeQueryTabkey];
     index = index < 1 ? 1 : index;
@@ -528,6 +540,7 @@ const Self = () => {
         clearEditable={clearEditable}
         updatePoint={updatePoint}
         wrapTableRef={wrapTableRef}
+        timeDisplayForm={timeDisplayForm}
       />
     );
   }
