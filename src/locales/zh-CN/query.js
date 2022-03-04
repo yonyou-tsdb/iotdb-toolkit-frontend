@@ -37,4 +37,5 @@ export default {
   'query.result.return.text': '返回',
   'query.result.return.rows': '条结果',
   'query.result.time.displayAs': '时间显示方式',
+  'query.result.download': '下载',
 }

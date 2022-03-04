@@ -66,6 +66,7 @@
     "bizcharts-plugin-slider": "^2.1.1-beta.1",
     "codemirror": "^5.65.0",
     "gg-editor": "^2.0.2",
+    "js-export-excel": "^1.1.4",
     "lodash": "^4.17.11",
     "lodash-decorators": "^6.0.0",
     "moment": "^2.25.3",

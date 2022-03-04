@@ -37,4 +37,5 @@ export default {
   'query.result.return.text': 'return',
   'query.result.return.rows': 'rows',
   'query.result.time.displayAs': 'Time display as',
+  'query.result.download': 'Download',
 }

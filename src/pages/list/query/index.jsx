@@ -25,8 +25,9 @@ import '../../../../node_modules/codemirror/addon/hint/show-hint';
 import '../../../../node_modules/codemirror/addon/hint/sql-hint';
 import '../../../../node_modules/codemirror/addon/comment/comment';
 import { v4 as uuid } from 'uuid';
-import { VList, EditableTable } from '../../../utils/virtual-table'
-import {BetterInputNumber} from '../../../utils/BetterInputNumber'
+import { VList, EditableTable } from '../../../utils/virtual-table';
+import {BetterInputNumber} from '../../../utils/BetterInputNumber';
+import ExportJsonExcel from "js-export-excel";
 const Self = () => {
   const intl = useIntl();
   const { initialState, setInitialState } = useModel('@@initialState');
@@ -95,7 +96,7 @@ const Self = () => {
   const [resultLocatorValue, setResultLocatorValue] = useState([]);
   const [editableForm] = Form.useForm();
   const resultLocator =
-    <>
+  <>
     <Divider type="vertical" />
     <span>{intl.formatMessage({id: 'query.result.locate.text',})} </span>
     <BetterInputNumber style={{
@@ -119,7 +120,32 @@ const Self = () => {
       <Option value="number">Number</Option>
       <Option value="utc">UTC</Option>
     </Select>
-    </>;
+    <Divider type="vertical" />
+    <a onClick={()=>{
+      let header = resultColumnRef.current[activeQueryTabkey].map((item,index)=>{
+            return item.title;
+      }).filter(item => item!='index');
+      exportExcel(activeQueryTabkey,header,resultData[activeQueryTabkey]);
+    }}>{intl.formatMessage({id: 'query.result.download',})}</a>
+  </>;
+  const exportExcel = (sheetName,sheetHeader,sheetData) => {
+    let option = {};
+    option.fileName = sheetName;
+    let columnWidths = sheetHeader.map((item,index)=>{
+          return 10;
+    });
+    option.datas = [
+        {
+            sheetData: sheetData,
+            sheetName: sheetName,
+            sheetFilter: sheetHeader,
+            sheetHeader: sheetHeader,
+            columnWidths: columnWidths,
+        },
+    ];
+    var toExcel = new ExportJsonExcel(option); //new
+    toExcel.saveExcel();
+  }
   const changeTimeDisplayForm = (v) => {
     timeDisplayForm[activeQueryTabkey] = v;
     setTimeDisplayForm({...timeDisplayForm});
@@ -394,10 +420,10 @@ const Self = () => {
           Object.keys(data[i]).map((item,index)=>{
             if(columnObj[item]==null){
               columnObj[item] = {title:item
-                , editable:item=='Time'? false: true
+                , editable:(item=='Time'||item=='Device')? false: true
                 , dataIndex: item, width:item=='Time'?150:190
                 , key: item,
-                fixed: item=='Time'?'left':false,
+                fixed: (item=='Time'||item=='Device')?'left':false,
               };
               columnObj[columnObj.length]=columnObj[item];
             }
