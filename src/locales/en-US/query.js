@@ -27,7 +27,7 @@ export default {
   'query.query.text': 'Query',
   'query.query.rule': 'Query tab reaches the upper limit',
   'query.query.description': 'Please select the query tab first',
-  'query.result.locate.text': 'Go to specified row',
+  'query.result.locate.text': 'Go to specified',
   'query.result.load.ing': 'Loading',
   'query.result.load.done': 'Load complete',
   'query.result.load.next': 'Load next page',
@@ -38,4 +38,6 @@ export default {
   'query.result.return.rows': 'rows',
   'query.result.time.displayAs': 'Time display as',
   'query.result.download': 'Download',
+  'query.result.locate.by': 'by',
+  'query.result.locate.or': 'or',
 }

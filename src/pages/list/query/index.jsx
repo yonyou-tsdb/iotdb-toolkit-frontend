@@ -1,6 +1,6 @@
 import {DingdingOutlined, DownOutlined, EllipsisOutlined, InfoCircleOutlined, PlayCircleOutlined,
   SaveOutlined, PauseCircleOutlined, PlusCircleOutlined, CloseCircleOutlined, FileSearchOutlined,
-  ExportOutlined, ImportOutlined, SearchOutlined,} from '@ant-design/icons';
+  ExportOutlined, ImportOutlined, SearchOutlined} from '@ant-design/icons';
 import {Badge, Button, Card, Statistic, Descriptions, Divider, Dropdown, Menu, Popover, Table, Tooltip, Empty,
   notification, Upload, Typography, Form, Input, InputNumber, Popconfirm, Select } from 'antd';
 import { GridContent, PageContainer, RouteContext } from '@ant-design/pro-layout';
@@ -28,6 +28,7 @@ import { v4 as uuid } from 'uuid';
 import { VList, EditableTable } from '../../../utils/virtual-table';
 import {BetterInputNumber} from '../../../utils/BetterInputNumber';
 import ExportJsonExcel from "js-export-excel";
+const { Option } = Select;
 const Self = () => {
   const intl = useIntl();
   const { initialState, setInitialState } = useModel('@@initialState');
@@ -93,6 +94,7 @@ const Self = () => {
   const [queryToken, setQueryToken] = useState([]);
   const [columns, setColumns] = useState([{}]);
   const [editingKey, setEditingKey] = useState('');
+  const [resultLocatorIndex, setResultLocatorIndex] = useState({});
   const [resultLocatorValue, setResultLocatorValue] = useState([]);
   const [editableForm] = Form.useForm();
   const resultLocator =
@@ -100,18 +102,26 @@ const Self = () => {
     <Divider type="vertical" />
     <span>{intl.formatMessage({id: 'query.result.locate.text',})} </span>
     <BetterInputNumber style={{
-      width: 100,
+      width: 170,
       size: "small",
-    }} placeholder="Index.."
+    }} placeholder="index or Time.."
       min={0}
-      max={10000000}
+      max={9223372036854775807}
       onChange={(v)=>{
         resultLocatorValue[activeQueryTabkey]=v;
         setResultLocatorValue({...resultLocatorValue});
       }}
-      onPressEnter={()=>{resultLocateTo()}}
+      onPressEnter={()=>{
+        resultLocateToIndex();
+      }}
      addonAfter={
-      <a onClick={()=>{resultLocateTo()}} ><SearchOutlined /></a>
+      <>
+      <a onClick={()=>{resultLocateToIndex()}} >index </a>
+      <Divider type="vertical" />
+      {intl.formatMessage({id: 'query.result.locate.or',})}
+      <Divider type="vertical" />
+      <a onClick={()=>{resultLocateToByTime()}} >Time </a>
+      </>
     } />
     <Divider type="vertical" />
     <Select placeholder={intl.formatMessage({id: 'query.result.time.displayAs',})}
@@ -125,7 +135,7 @@ const Self = () => {
       let header = resultColumnRef.current[activeQueryTabkey].map((item,index)=>{
             return item.title;
       }).filter(item => item!='index');
-      exportExcel(activeQueryTabkey,header,resultData[activeQueryTabkey]);
+      exportExcel(activeQueryTabkey,header,resultDataRef.current[activeQueryTabkey]);
     }}>{intl.formatMessage({id: 'query.result.download',})}</a>
   </>;
   const exportExcel = (sheetName,sheetHeader,sheetData) => {
@@ -150,8 +160,24 @@ const Self = () => {
     timeDisplayForm[activeQueryTabkey] = v;
     setTimeDisplayForm({...timeDisplayForm});
   }
+  const resultLocateToIndex = () => {
+    resultLocatorIndex[activeQueryTabkey] = resultLocatorValue[activeQueryTabkey];
+    setResultLocatorIndex({...resultLocatorIndex});
+    resultLocateTo();
+  }
+  const resultLocateToByTime = () => {
+    if(resultColumnRef.current[activeQueryTabkey][1].title=='Time'){
+      let ceilingItem = resultDataRef.current[activeQueryTabkey].find(
+        item => item.Time >= resultLocatorValue[activeQueryTabkey]);
+      ceilingItem = ceilingItem == null?
+        resultDataRef.current[activeQueryTabkey][resultDataRef.current[activeQueryTabkey].length-1]:ceilingItem;
+      resultLocatorIndex[activeQueryTabkey] = ceilingItem.index;
+      setResultLocatorIndex({...resultLocatorIndex});
+      resultLocateTo();
+    }
+  }
   const resultLocateTo = () => {
-    let index = resultLocatorValue[activeQueryTabkey]==null?0:resultLocatorValue[activeQueryTabkey];
+    let index = resultLocatorIndex[activeQueryTabkey]==null?0:resultLocatorIndex[activeQueryTabkey];
     index = index < 1 ? 1 : index;
     let top = 77 * (index - 1);
     wrapTableRef.current.parentNode.scrollTop=top;
@@ -421,7 +447,7 @@ const Self = () => {
             if(columnObj[item]==null){
               columnObj[item] = {title:item
                 , editable:(item=='Time'||item=='Device')? false: true
-                , dataIndex: item, width:item=='Time'?150:190
+                , dataIndex: item, width:190
                 , key: item,
                 fixed: (item=='Time'||item=='Device')?'left':false,
               };

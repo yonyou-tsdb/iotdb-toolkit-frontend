@@ -27,7 +27,7 @@ export default {
   'query.query.text': '查询',
   'query.query.rule': '查询窗口达到上限',
   'query.query.description': '请先选中查询窗口',
-  'query.result.locate.text': '跳转至指定行',
+  'query.result.locate.text': '跳转至指定',
   'query.result.load.ing': '加载中',
   'query.result.load.done': '加载完毕',
   'query.result.load.next': '加载下一页',
@@ -38,4 +38,6 @@ export default {
   'query.result.return.rows': '条结果',
   'query.result.time.displayAs': '时间显示方式',
   'query.result.download': '下载',
+  'query.result.locate.by': '按',
+  'query.result.locate.or': '或',
 }
