@@ -1,5 +1,5 @@
 export default {
-  'query.sql.execute': '执行',
+  'query.sql.execute':  '执行',
   'query.sql.export': '导出',
   'query.sql.export.required': '请输入导出用SQL',
   'query.sql.export.sqlWithRequired': '导出用SQL（必填）',
