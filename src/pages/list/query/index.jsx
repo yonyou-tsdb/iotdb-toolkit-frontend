@@ -33,14 +33,18 @@ const Self = () => {
   const intl = useIntl();
   const { initialState, setInitialState } = useModel('@@initialState');
   const [querySql, setQuerySql] = useState({'query1':'SHOW STORAGE GROUP'});
+  const [querySqlReal, setQuerySqlReal] = useState({'query1':'SHOW STORAGE GROUP'});
   const [activeQueryTabkey, setActiveQueryTabkey] = useState('query1');
+  const activeQueryTabkeyRef = useRef('query1');
+  useEffect(() => {
+    activeQueryTabkeyRef.current = activeQueryTabkey
+  }, [activeQueryTabkey])
   const [readOnly, setReadOnly] = useState(false);
   const [sqlModalVisible, setSqlModalVisible] = useState(false);
   const [sqlModalContent, setSqlModalContent] = useState(undefined);
   const [addQueryVisible, setAddQueryVisible] = useState(false);
   const [exportModalVisible, setExportModalVisible] = useState(false);
   const [importModalVisible, setImportModalVisible] = useState(false);
-  const [initExportSql, setInitExportSql ] = useState(undefined);
   const wrapTableRef = useRef(null);
   let contentList = null;
   const codeMirror = (
@@ -66,6 +70,12 @@ const Self = () => {
           editor.showHint();
         }
         querySql[activeQueryTabkey]=value;
+        querySqlReal[activeQueryTabkey]=value;
+      }}
+      onCursorActivity={(codeMirror) => {
+        if(codeMirror.getSelection()!=null && codeMirror.getSelection()!=''){
+          querySqlReal[activeQueryTabkeyRef.current]=codeMirror.getSelection();
+        }
       }}
     />
   );
@@ -378,7 +388,9 @@ const Self = () => {
       queryToken[activeQueryTabkey]=token;
       setQueryToken({...queryToken});
     }
-    let ret = await querySqlWithTenantUsingPOST({sqls: querySql[activeQueryTabkey],
+    let sql = querySqlReal[activeQueryTabkeyRef.current];
+    querySqlReal[activeQueryTabkeyRef.current]=querySql[activeQueryTabkeyRef.current];
+    let ret = await querySqlWithTenantUsingPOST({sqls: sql,
       queryToken: queryToken[activeQueryTabkey]});
     if(ret.code == '0'){
       let messageJson = JSON.parse(ret.message || '{}');
@@ -540,11 +552,9 @@ const Self = () => {
                 overlay={
                 <Menu>
                   <Menu.Item key="exportCsv" onClick={() => {
-                    setInitExportSql(querySql[activeQueryTabkey]);
                     setExportModalVisible(true);
                   }} ><ExportOutlined /> {intl.formatMessage({id: 'query.sql.export',})}</Menu.Item>
                   <Menu.Item key="importCsv" onClick={() => {
-                    setInitExportSql(querySql[activeQueryTabkey]);
                     setImportModalVisible(true);
                   }} ><ImportOutlined /> {intl.formatMessage({id: 'query.sql.import',})}</Menu.Item>
                 </Menu>}
@@ -645,14 +655,12 @@ const Self = () => {
         setVisible={setExportModalVisible}
         exportCsv={exportCsv}
         activeQueryTabkey={activeQueryTabkey}
-        initExportSql={initExportSql}
       />
       <ImportModal
         destroyOnClose={true}
         visible={importModalVisible}
         setVisible={setImportModalVisible}
         activeQueryTabkey={activeQueryTabkey}
-        initExportSql={initExportSql}
       />
     </PageContainer>
   );

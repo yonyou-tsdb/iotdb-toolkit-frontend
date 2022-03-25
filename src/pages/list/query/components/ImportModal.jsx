@@ -20,7 +20,7 @@ import moment from 'moment';
 import CommonUtil from '../../../../utils/CommonUtil';
 const OperationModal = (props) => {
   const intl = useIntl();
-  const { done, visible, setVisible, activeQueryTabkey, initExportSql } = props;
+  const { done, visible, setVisible, activeQueryTabkey } = props;
   const [timer, setTimer] = React.useState(undefined);
   const [exportZone, setExportZone] = React.useState('+08:00');
   const [compress, setCompress] = React.useState('plain');

@@ -28,7 +28,7 @@ import '../../../../../node_modules/codemirror/addon/hint/sql-hint';
 import '../../../../../node_modules/codemirror/addon/comment/comment';
 const OperationModal = (props) => {
   const intl = useIntl();
-  const { done, visible, setVisible, exportCsv, activeQueryTabkey, initExportSql } = props;
+  const { done, visible, setVisible, exportCsv, activeQueryTabkey } = props;
   const { initialState, setInitialState } = useModel('@@initialState');
   const [exportName, setExportName] = React.useState(undefined);
   const [exportSql] = useState({'query1':'select * from root'});
