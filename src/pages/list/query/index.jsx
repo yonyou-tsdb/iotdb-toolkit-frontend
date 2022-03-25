@@ -1,4 +1,4 @@
-import {DingdingOutlined, DownOutlined, EllipsisOutlined, InfoCircleOutlined, PlayCircleOutlined,
+import {MenuOutlined, EllipsisOutlined, InfoCircleOutlined, PlayCircleOutlined,
   SaveOutlined, PauseCircleOutlined, PlusCircleOutlined, CloseCircleOutlined, FileSearchOutlined,
   ExportOutlined, ImportOutlined, SearchOutlined} from '@ant-design/icons';
 import {Badge, Button, Card, Statistic, Descriptions, Divider, Dropdown, Menu, Popover, Table, Tooltip, Empty,
@@ -16,6 +16,7 @@ import OperationModal from './components/OperationModal';
 import AddQueryModal from './components/AddQueryModal';
 import ExportModal from './components/ExportModal';
 import ImportModal from './components/ImportModal';
+import { format as sqlFormat } from 'sql-formatter';
 import {UnControlled as CodeMirror} from '../../../../node_modules/react-codemirror2'
 import '../../../../node_modules/codemirror/lib/codemirror.css';
 import '../../../utils/iotdb-sql/iotdb-sql';
@@ -488,6 +489,12 @@ const Self = () => {
     setAddQueryVisible(true);
   }
 
+  const formatQuery = () => {
+    let formatted = sqlFormat(querySql[activeQueryTabkey]);
+    querySql[activeQueryTabkey]=formatted;
+    setQuerySql({...querySql});
+  }
+
   const updatePoint = async(timestamp, point, value) => {
     if(alertQueryTab()){ return; };
     let ret = await updatePointWithTenantUsingPOST({point: point, value: value,
@@ -541,6 +548,9 @@ const Self = () => {
             <ButtonGroup>
               <Button onClick={runQuery} type="primary"><PlayCircleOutlined />
                 {intl.formatMessage({id: 'query.sql.execute',})}
+              </Button>
+              <Button onClick={formatQuery}><MenuOutlined />
+                {intl.formatMessage({id: 'query.sql.format',})}
               </Button>
               <Button onClick={showSaveQueryModal}><FileSearchOutlined />
                 {intl.formatMessage({id: 'query.sql.script.save',})}

@@ -12,6 +12,7 @@ export default {
   'query.sql.export.timeFormat.timestamp': 'Timestamp',
   'query.sql.export.timeZone': 'Time Zone',
   'query.sql.export.timeZone.description': 'Time zone only effect for non-numeric time',
+  'query.sql.format': 'Format',
   'query.sql.import': 'Import',
   'query.sql.import.selectFile': 'Select File',
   'query.sql.import.compression.no.rule': 'If choose no compression, you can only upload .csv file',

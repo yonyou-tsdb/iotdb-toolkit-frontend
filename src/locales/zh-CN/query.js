@@ -12,6 +12,7 @@ export default {
   'query.sql.export.timeFormat.timestamp': '时间戳',
   'query.sql.export.timeZone': '时区',
   'query.sql.export.timeZone.description': '时区只对非数字型时间有效',
+  'query.sql.format': '格式化',
   'query.sql.import': '导入',
   'query.sql.import.selectFile': '选择文件',
   'query.sql.import.compression.no.rule': 'If choose no compression, you can only upload .csv file',

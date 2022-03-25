@@ -81,6 +81,7 @@
     "react-router": "^4.3.1",
     "react-uuid": "^1.0.2",
     "react-window": "^1.8.6",
+    "sql-formatter": "^4.0.2",
     "umi": "^3.5.0",
     "umi-plugin-setting-drawer": "^1.0.3",
     "umi-serve": "^1.9.10",
