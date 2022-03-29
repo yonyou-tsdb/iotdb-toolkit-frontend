@@ -42,4 +42,5 @@ export default {
   'query.result.download': '下载',
   'query.result.locate.by': '按',
   'query.result.locate.or': '或',
+  'query.result.expired': '查询已过期',
 }

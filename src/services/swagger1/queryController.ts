@@ -209,6 +209,10 @@ export async function querySqlWithTenantUsingGET(
     sqls: string;
     /** queryToken */
     queryToken: string;
+    /** tabKey */
+    tabKey: string;
+    /** tabToken */
+    tabToken: string;
     // path
   },
   options?: { [key: string]: any },
@@ -231,6 +235,10 @@ export async function querySqlWithTenantUsingPOST(
     sqls: string;
     /** queryToken */
     queryToken: string;
+    /** tabKey */
+    tabKey: string;
+    /** tabToken */
+    tabToken: string;
     // path
   },
   options?: { [key: string]: any },
@@ -251,6 +259,10 @@ export async function querySqlAppendWithTenantUsingGET(
     // query
     /** queryToken */
     queryToken: string;
+    /** tabKey */
+    tabKey: string;
+    /** tabToken */
+    tabToken: string;
     // path
   },
   options?: { [key: string]: any },
@@ -271,6 +283,10 @@ export async function querySqlAppendWithTenantUsingPOST(
     // query
     /** queryToken */
     queryToken: string;
+    /** tabKey */
+    tabKey: string;
+    /** tabToken */
+    tabToken: string;
     // path
   },
   options?: { [key: string]: any },

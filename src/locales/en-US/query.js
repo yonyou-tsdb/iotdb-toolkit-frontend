@@ -42,4 +42,5 @@ export default {
   'query.result.download': 'Download',
   'query.result.locate.by': 'by',
   'query.result.locate.or': 'or',
+  'query.result.expired': 'Query has expired',
 }

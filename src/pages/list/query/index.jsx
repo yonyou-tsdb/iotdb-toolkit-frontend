@@ -46,6 +46,11 @@ const Self = () => {
   const [addQueryVisible, setAddQueryVisible] = useState(false);
   const [exportModalVisible, setExportModalVisible] = useState(false);
   const [importModalVisible, setImportModalVisible] = useState(false);
+  const [queryTabTokens, setQueryTabTokens] = useState({});
+  const queryTabTokensRef = useRef([]);
+  useEffect(() => {
+    queryTabTokensRef.current = queryTabTokens
+  }, [queryTabTokens])
   const wrapTableRef = useRef(null);
   let contentList = null;
   const codeMirror = (
@@ -218,10 +223,21 @@ const Self = () => {
       {resultLocator}
       </>
     );
-    let ret = await querySqlAppendWithTenantUsingPOST({queryToken: queryToken[activeQueryTabkey]});
+    let tabToken = uuid().replaceAll('-','');
+    queryTabTokens[activeQueryTabkeyRef.current] = tabToken;
+    setQueryTabTokens({...queryTabTokens});
+    let ret = await querySqlAppendWithTenantUsingPOST({queryToken: queryToken[activeQueryTabkey],
+      tabKey: activeQueryTabkeyRef.current, tabToken: tabToken
+    });
     if(ret.code=='0'){
       resultColumn[activeQueryTabkey]=[];
       let messageJson = JSON.parse(ret.message || '{}');
+      if(messageJson.tabToken != queryTabTokensRef.current[messageJson.tabKey]){
+        notification.error({
+          message: intl.formatMessage({id: 'query.result.expired',}),
+        });
+        return;
+      }
       let data = ret.data == null? [] : ret.data;
       let l = resultDataRef.current[activeQueryTabkey].length;
       resultSize[activeQueryTabkey]=l+data.length;
@@ -399,10 +415,19 @@ const Self = () => {
     }
     let sql = querySqlReal[activeQueryTabkeyRef.current];
     querySqlReal[activeQueryTabkeyRef.current]=querySql[activeQueryTabkeyRef.current];
-    let ret = await querySqlWithTenantUsingPOST({sqls: sql,
-      queryToken: queryToken[activeQueryTabkey]});
+    let tabToken = uuid().replaceAll('-','');
+    queryTabTokens[activeQueryTabkeyRef.current] = tabToken;
+    setQueryTabTokens({...queryTabTokens});
+    let ret = await querySqlWithTenantUsingPOST({sqls: sql, queryToken: queryToken[activeQueryTabkey],
+      tabKey: activeQueryTabkeyRef.current, tabToken: tabToken});
     if(ret.code == '0'){
       let messageJson = JSON.parse(ret.message || '{}');
+      if(messageJson.tabToken != queryTabTokensRef.current[messageJson.tabKey]){
+        notification.error({
+          message: intl.formatMessage({id: 'query.result.expired',}),
+        });
+        return;
+      }
       let data = ret.data == null ? [] : ret.data;
       resultTimeCost[activeQueryTabkey]=messageJson.costMilliSecond == null?0:messageJson.costMilliSecond;
       setResultTimeCost({...resultTimeCost});
