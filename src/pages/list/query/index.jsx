@@ -1,6 +1,6 @@
 import {MenuOutlined, EllipsisOutlined, InfoCircleOutlined, PlayCircleOutlined,
   SaveOutlined, PauseCircleOutlined, PlusCircleOutlined, CloseCircleOutlined, FileSearchOutlined,
-  ExportOutlined, ImportOutlined, SearchOutlined} from '@ant-design/icons';
+  ExportOutlined, ImportOutlined, SearchOutlined, QuestionCircleOutlined} from '@ant-design/icons';
 import {Badge, Button, Card, Statistic, Descriptions, Divider, Dropdown, Menu, Popover, Table, Tooltip, Empty,
   notification, Upload, Typography, Form, Input, InputNumber, Popconfirm, Select } from 'antd';
 import { GridContent, PageContainer, RouteContext } from '@ant-design/pro-layout';
@@ -57,7 +57,14 @@ const Self = () => {
         autofocus: true,
         lineNumbers: true,
         tabindex: 1,
-        extraKeys: {"Alt-/": "autocomplete", "Ctrl-/": "toggleComment"},
+        extraKeys: {
+          "Alt-/": "autocomplete",
+          "Cmd-/": "toggleComment",
+          "Ctrl-/": "toggleComment",
+          'Shift-Cmd-F': ()=>{formatQuery()},
+          'Shift-Ctrl-F': ()=>{formatQuery()},
+          'F8': ()=>{runQuery()},
+        },
         matchBrackets: true,
         readOnly: readOnly,
         indentWithTabs: true,
@@ -65,6 +72,7 @@ const Self = () => {
         hintOptions: {
           completeSingle: false
         },
+        autofocus: false,
       }}
       onChange={(editor, data, value) => {
         if(data.origin!=null&&((data.removed[0].trim()!='') || data.text[0].match(/^[a-zA-Z0-9_]+$/)) ){
@@ -491,6 +499,8 @@ const Self = () => {
 
   const formatQuery = () => {
     let formatted = sqlFormat(querySql[activeQueryTabkey]);
+    querySql[activeQueryTabkey]="";
+    setQuerySql({...querySql});
     querySql[activeQueryTabkey]=formatted;
     setQuerySql({...querySql});
   }
@@ -544,13 +554,13 @@ const Self = () => {
           );
         }
         return (
-          <Fragment>
+          <Fragment >
+            <Tooltip title={intl.formatMessage({id: 'query.sql.tooltip',})}>
+              <QuestionCircleOutlined />
+            </Tooltip>
             <ButtonGroup>
               <Button onClick={runQuery} type="primary"><PlayCircleOutlined />
                 {intl.formatMessage({id: 'query.sql.execute',})}
-              </Button>
-              <Button onClick={formatQuery}><MenuOutlined />
-                {intl.formatMessage({id: 'query.sql.format',})}
               </Button>
               <Button onClick={showSaveQueryModal}><FileSearchOutlined />
                 {intl.formatMessage({id: 'query.sql.script.save',})}

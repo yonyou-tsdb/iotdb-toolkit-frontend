@@ -167,7 +167,7 @@ export const BasicList = () => {
 
   const searchTimeseries = async (currentValue, filter) => {
     let token = uuid().replaceAll('-','');
-    let ret = await showTimeseriesWithTenantUsingPOST({path:currentValue+'.'+filter, token:token});
+    let ret = await showTimeseriesWithTenantUsingPOST({path:currentValue+'.'+filter+'*', token:token});
     if(ret.code=='0'){
       let messageJson = JSON.parse(ret.message || '{}');
       setPageTimeseriesHasMore(messageJson.hasMore);

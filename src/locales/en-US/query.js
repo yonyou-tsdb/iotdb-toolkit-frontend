@@ -25,6 +25,7 @@ export default {
   'query.sql.script.create': 'Create Script',
   'query.sql.script.name': 'Script Name',
   'query.sql.script.createTime': 'Create Time',
+  'query.sql.tooltip': 'The following hotkeys can be used when SQL input focus. F8: execute SQL; Shift+Ctrl(Cmd)+F: format SQL; Ctrl(Cmd)+/: comment/uncomment; you can execute only the part selected by the mouse',
   'query.query.text': 'Query',
   'query.query.rule': 'Query tab reaches the upper limit',
   'query.query.description': 'Please select the query tab first',
