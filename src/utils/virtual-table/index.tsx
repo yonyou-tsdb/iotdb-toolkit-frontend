@@ -353,6 +353,8 @@ const BuildEditableTable = (props) => {
             if(ret!=null && ret.message!=null){
               if(ret.code=='0'){
                 const row = (await form.validateFields()) ;
+                row[dataIndex] = ret.data;
+                form.setFieldsValue({...row});
                 const newData = [...data[active]];
                 data[active] = newData;
                 const index = newData.findIndex(item => record[rowKey] === item[rowKey]);
