@@ -81,9 +81,10 @@ const { done, visible, current, onDone, onSubmit, children, isReadonly, doneResu
             rules={[
               {
                 required: true,
-                message: intl.formatMessage({
+                max: 15,
+                message: (useIntl().formatMessage({
                   id: 'header.datasource-manage.connection-name.require',
-                }),
+                })+" (No more than 15 character)"),
               },
             ]}
           />
@@ -97,9 +98,10 @@ const { done, visible, current, onDone, onSubmit, children, isReadonly, doneResu
             rules={[
               {
                 required: true,
-                message: intl.formatMessage({
+                max: 64,
+                message: (useIntl().formatMessage({
                   id: 'header.datasource-manage.ip.require',
-                }),
+                })+" (No more than 64 character)"),
               },
             ]}
           />
@@ -142,9 +144,10 @@ const { done, visible, current, onDone, onSubmit, children, isReadonly, doneResu
             rules={[
               {
                 required: true,
-                message: intl.formatMessage({
+                max: 20,
+                message: (useIntl().formatMessage({
                   id: 'header.datasource-manage.username.require',
-                }),
+                })+" (No more than 20 character)"),
               },
             ]}
           />
@@ -158,6 +161,7 @@ const { done, visible, current, onDone, onSubmit, children, isReadonly, doneResu
               })}
               initialValue=' '
               rules={[
+                {max: 20},
                 {
                     validator: (rule, value, cbfn) => {
                         if (value.trim()==='') {
@@ -169,6 +173,9 @@ const { done, visible, current, onDone, onSubmit, children, isReadonly, doneResu
                     },
                 },
               ]}
+              fieldProps={{
+                visibilityToggle: false,
+              }}
             />
           )}
         </>

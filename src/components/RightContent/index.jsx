@@ -134,10 +134,10 @@ const GlobalHeaderRight = () => {
           rules={[
             {
               required: true,
-              max: 12,
+              max: 15,
               message: (useIntl().formatMessage({
                 id: 'header.datasource-manage.connection-name.require',
-              })+" (No more than 12 character)"),
+              })+" (No more than 15 character)"),
             },
           ]}
           placeholder={useIntl().formatMessage({

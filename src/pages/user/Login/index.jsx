@@ -161,14 +161,12 @@ const Login = () => {
                 key="account"
                 tab={intl.formatMessage({
                   id: 'pages.login.accountLogin.tab',
-                  defaultMessage: '账户密码登录',
                 })}
               />
               <Tabs.TabPane
                 key="mobile"
                 tab={intl.formatMessage({
                   id: 'pages.login.forgotPassword',
-                  defaultMessage: '忘记密码',
                 })}
                 disabled={true}
               />
@@ -178,7 +176,6 @@ const Login = () => {
               <LoginMessage
                 content={intl.formatMessage({
                   id: 'pages.login.accountLogin.errorMessage',
-                  defaultMessage: '账户或密码错误（admin/ant.design)',
                 })}
               />
             )}
@@ -192,7 +189,6 @@ const Login = () => {
                   }}
                   placeholder={intl.formatMessage({
                     id: 'pages.login.username.placeholder',
-                    defaultMessage: '用户名: admin',
                   })}
                   rules={[
                     {
@@ -200,7 +196,6 @@ const Login = () => {
                       message: (
                         <FormattedMessage
                           id="pages.login.username.required"
-                          defaultMessage="请输入用户名!"
                         />
                       ),
                     },
@@ -214,7 +209,6 @@ const Login = () => {
                   }}
                   placeholder={intl.formatMessage({
                     id: 'pages.login.password.placeholder',
-                    defaultMessage: '密码: Admin123',
                   })}
                   rules={[
                     {
@@ -324,13 +318,11 @@ const Login = () => {
               <Checkbox danger defaultChecked={true} noStyle name="autoLogin">
                 <FormattedMessage id="pages.login.rememberMe" defaultMessage="自动登录" />
               </Checkbox>
-              <a
-                style={{
-                  float: 'right',
-                }}
-              >
-                <FormattedMessage id="pages.login.registerAccount" defaultMessage="忘记密码" />
-              </a>
+              <Link to='/user/register' style={{
+                float: 'right',
+              }}>
+                <FormattedMessage id='pages.login.registerAccount' defaultMessage="注册账号" />
+              </Link>
             </div>
           </ProForm>
           <Space className={styles.other}>

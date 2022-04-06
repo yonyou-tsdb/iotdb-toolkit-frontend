@@ -41,29 +41,8 @@ const DataSourceDropdown = ({ menu }) => {
       setInitialState({ ...initialState, connectionLess: ret.data });
     }
   }
-  const gotoConnectionList = () => {
-    history.push({
-      pathname: '/result/autoSkip',
-      query:{
-        skipTo: '/list/connection-list',
-      },
-    });
-  }
   const createConnection = () => {
       setInitialState({ ...initialState, newConnectionVisable: true });
-  }
-  const loginOut = async () => {
-    await outLogin();
-    const { query = {}, pathname } = history.location;
-    const { redirect } = query; // Note: There may be security issues, please note
-    if (window.location.pathname !== '/user/login' && !redirect) {
-      history.replace({
-        pathname: '/user/login',
-        search: stringify({
-          redirect: pathname,
-        }),
-      });
-    }
   }
   const loading = (
     <span className={`${styles.action} ${styles.account}`}>

@@ -2,6 +2,26 @@
 /* eslint-disable */
 import { request } from 'umi';
 
+/** sendRegisterEmail GET /api/acquireCaptcha */
+export async function sendRegisterEmailUsingGET(
+  params: {
+    // query
+    /** token */
+    token: string;
+    // path
+  },
+  options?: { [key: string]: any },
+) {
+  const { ...queryParams } = params;
+  return request<any>('/api/acquireCaptcha', {
+    method: 'GET',
+    params: {
+      ...queryParams,
+    },
+    ...(options || {}),
+  });
+}
+
 /** /api/currentUser /api/currentUser GET /api/currentUser */
 export async function currentUserUsingGET(
   params: {
@@ -102,6 +122,110 @@ export async function outLoginUsingPOST(
   return request<Record<string, any>>('/api/outLogin', {
     method: 'POST',
     params: { ...queryParams },
+    ...(options || {}),
+  });
+}
+
+/** register GET /api/register */
+export async function registerUsingGET(
+  params: {
+    // query
+    /** mail */
+    mail: string;
+    /** username */
+    username: string;
+    /** password */
+    password: string;
+    /** captcha */
+    captcha: string;
+    /** token */
+    token: string;
+    // path
+  },
+  options?: { [key: string]: any },
+) {
+  const { ...queryParams } = params;
+  return request<API.BaseVOJSONObject_>('/api/register', {
+    method: 'GET',
+    params: {
+      ...queryParams,
+    },
+    ...(options || {}),
+  });
+}
+
+/** register POST /api/register */
+export async function registerUsingPOST(
+  params: {
+    // query
+    /** mail */
+    mail: string;
+    /** username */
+    username: string;
+    /** password */
+    password: string;
+    /** captcha */
+    captcha: string;
+    /** token */
+    token: string;
+    // path
+  },
+  options?: { [key: string]: any },
+) {
+  const { ...queryParams } = params;
+  return request<API.BaseVOJSONObject_>('/api/register', {
+    method: 'POST',
+    params: {
+      ...queryParams,
+    },
+    ...(options || {}),
+  });
+}
+
+/** sendRegisterEmail GET /api/sendRegisterEmail */
+export async function sendRegisterEmailUsingGET1(
+  params: {
+    // query
+    /** username */
+    username?: string;
+    /** password */
+    password?: string;
+    /** email */
+    email: string;
+    // path
+  },
+  options?: { [key: string]: any },
+) {
+  const { ...queryParams } = params;
+  return request<API.BaseVOJSONObject_>('/api/sendRegisterEmail', {
+    method: 'GET',
+    params: {
+      ...queryParams,
+    },
+    ...(options || {}),
+  });
+}
+
+/** sendRegisterEmail POST /api/sendRegisterEmail */
+export async function sendRegisterEmailUsingPOST(
+  params: {
+    // query
+    /** username */
+    username?: string;
+    /** password */
+    password?: string;
+    /** email */
+    email: string;
+    // path
+  },
+  options?: { [key: string]: any },
+) {
+  const { ...queryParams } = params;
+  return request<API.BaseVOJSONObject_>('/api/sendRegisterEmail', {
+    method: 'POST',
+    params: {
+      ...queryParams,
+    },
     ...(options || {}),
   });
 }

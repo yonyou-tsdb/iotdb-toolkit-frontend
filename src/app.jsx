@@ -7,7 +7,8 @@ import { currentUserUsingPOST as queryCurrentUser } from '@/services/swagger1/us
 import { connectionLessUsingPOST, } from '@/services/swagger1/connectionController';
 import { BookOutlined, LinkOutlined } from '@ant-design/icons';
 const isDev = process.env.NODE_ENV === 'development';
-const loginPath = '/user/login/';
+const loginPath = '/user/login';
+const registerPath = '/user/register';
 /** 获取用户信息比较慢的时候会展示一个 loading */
 
 export const initialStateConfig = {
@@ -37,8 +38,8 @@ export async function getInitialState() {
     }
     return undefined;
   }
-
-  if (history.location.pathname !== loginPath && history.location.pathname !== '/') {
+  if (history.location.pathname !== loginPath &&
+      history.location.pathname !== '/') {
     const currentUser = await fetchUserInfo();
     const connectionLess = await fetchConnectionLess();
     return {
@@ -49,7 +50,6 @@ export async function getInitialState() {
       settings: {},
     };
   }
-
   return {
     fetchConnectionLess,
     fetchUserInfo,
@@ -117,7 +117,8 @@ export const layout = ({ initialState }) => {
     onPageChange: () => {
       const { location } = history; // 如果没有登录，重定向到 login
 
-      if (!initialState?.currentUser && location.pathname !== loginPath) {
+      if (!initialState?.currentUser
+          && location.pathname !== loginPath && location.pathname !== registerPath) {
         history.push(loginPath);
       }
     },

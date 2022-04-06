@@ -1,8 +1,11 @@
-import { useState, useEffect } from 'react';
-import { Form, Button, Col, Input, Popover, Progress, Row, Select, message } from 'antd';
-import { Link, useRequest, history } from 'umi';
-import { fakeRegister } from './service';
+import { useState, useEffect, useRef } from 'react';
+import { Form, Button, Col, Input, Popover, Progress, Row, Select, message, notification } from 'antd';
+import { Link, useRequest, history, useIntl } from 'umi';
+import ProForm, { ProFormCaptcha, ProFormCheckbox, ProFormText } from '@ant-design/pro-form';
+import { registerUsingPOST } from '@/services/swagger1/userController';
 import styles from './style.less';
+import defaultCaptchaImg from '../../../assets/captcha-pure.png';
+import { v4 as uuid } from 'uuid';
 const FormItem = Form.Item;
 const { Option } = Select;
 const InputGroup = Input.Group;
@@ -30,10 +33,19 @@ const passwordProgressMap = {
 };
 
 const Register = () => {
+  const intl = useIntl();
   const [count, setCount] = useState(0);
   const [visible, setVisible] = useState(false);
   const [prefix, setPrefix] = useState('86');
   const [popover, setPopover] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
+  const initToken = uuid().replaceAll('-','');
+  const [token, setToken] = useState(initToken);
+  const tokenRef = useRef(initToken);
+  useEffect(() => {
+    tokenRef.current = token
+  }, [token]);
+  const [captchaUrl, setCaptchaUrl] = useState('../api/acquireCaptcha?token='+initToken);
   const confirmDirty = false;
   let interval;
   const [form] = Form.useForm();
@@ -43,19 +55,6 @@ const Register = () => {
     },
     [interval],
   );
-
-  const onGetCaptcha = () => {
-    let counts = 59;
-    setCount(counts);
-    interval = window.setInterval(() => {
-      counts -= 1;
-      setCount(counts);
-
-      if (counts === 0) {
-        clearInterval(interval);
-      }
-    }, 1000);
-  };
 
   const getPasswordStatus = () => {
     const value = form.getFieldValue('password');
@@ -71,8 +70,24 @@ const Register = () => {
     return 'poor';
   };
 
-  const onFinish = (values) => {
-    register(values);
+  const onFinish = async (values) => {
+    if(token == null){
+      return;
+    }
+    changeCaptchaToDefault();
+    let tokenRefCurrent = tokenRef.current;
+    setToken(null);
+    let ret = await registerUsingPOST({...values, token: tokenRefCurrent});
+    console.log(ret);
+    if(ret.code=='0'){
+      notification.success({
+        message: '注册邮件已经发送至邮箱中，请您于24小时内激活账号',
+      });
+    }else{
+      notification.error({
+        message: ret.message,
+      });
+    }
   };
 
   const checkConfirm = (_, value) => {
@@ -85,58 +100,49 @@ const Register = () => {
     return promise.resolve();
   };
 
-  const checkPassword = (_, value) => {
-    const promise = Promise; // 没有值的情况
+  const changeCaptcha = () => {
+    let tabToken = uuid().replaceAll('-','');
+    setToken(tabToken);
+    setCaptchaUrl('../api/acquireCaptcha?token='+tabToken);
+  }
 
-    if (!value) {
-      setVisible(!!value);
-      return promise.reject('请输入密码!');
-    } // 有值的情况
-
-    if (!visible) {
-      setVisible(!!value);
-    }
-
-    setPopover(!popover);
-
-    if (value.length < 6) {
-      return promise.reject('');
-    }
-
-    if (value && confirmDirty) {
-      form.validateFields(['confirm']);
-    }
-
-    return promise.resolve();
-  };
-
-  const changePrefix = (value) => {
-    setPrefix(value);
-  };
-
-  const renderPasswordProgress = () => {
-    const value = form.getFieldValue('password');
-    const passwordStatus = getPasswordStatus();
-    return value && value.length ? (
-      <div className={styles[`progress-${passwordStatus}`]}>
-        <Progress
-          status={passwordProgressMap[passwordStatus]}
-          className={styles.progress}
-          strokeWidth={6}
-          percent={value.length * 10 > 100 ? 100 : value.length * 10}
-          showInfo={false}
-        />
-      </div>
-    ) : null;
-  };
+  const changeCaptchaToDefault = () => {
+    setCaptchaUrl(defaultCaptchaImg);
+  }
 
   return (
     <div className={styles.main}>
       <h3>注册</h3>
-      <Form form={form} name="UserRegister" onFinish={onFinish}>
-        <FormItem
+      <ProForm form={form} name="UserRegister" onFinish={onFinish}
+      submitter={{
+        render: (_, dom) => {},
+      }}
+      >
+        <ProFormText
+          label="账号"
+          name="username"
+          fieldProps={{
+          }}
+          rules={[
+            {
+              max: 12,
+              min: 4,
+              required: true,
+            },
+            {
+              pattern: /^(?!_)[a-zA-Z0-9_]+$/,
+              message: intl.formatMessage({id: 'account.username.rule',}),
+            },
+          ]}
+        >
+        </ProFormText>
+        <ProFormText
+          label="邮箱"
           name="mail"
           rules={[
+            {
+              max: 100,
+            },
             {
               required: true,
               message: '请输入邮箱地址!',
@@ -147,42 +153,10 @@ const Register = () => {
             },
           ]}
         >
-          <Input size="large" placeholder="邮箱" />
-        </FormItem>
-        <Popover
-          getPopupContainer={(node) => {
-            if (node && node.parentNode) {
-              return node.parentNode;
-            }
+        </ProFormText>
 
-            return node;
-          }}
-          content={
-            visible && (
-              <div
-                style={{
-                  padding: '4px 0',
-                }}
-              >
-                {passwordStatusMap[getPasswordStatus()]}
-                {renderPasswordProgress()}
-                <div
-                  style={{
-                    marginTop: 10,
-                  }}
-                >
-                  <span>请至少输入 6 个字符。请不要使用容易被猜到的密码。</span>
-                </div>
-              </div>
-            )
-          }
-          overlayStyle={{
-            width: 240,
-          }}
-          placement="right"
-          visible={visible}
-        >
-          <FormItem
+          <ProFormText.Password
+            label="密码"
             name="password"
             className={
               form.getFieldValue('password') &&
@@ -191,62 +165,35 @@ const Register = () => {
             }
             rules={[
               {
-                validator: checkPassword,
+                pattern: /((?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{8,16})/,
+                message: '请输入至少8位包含数字和大小写字母的密码',
               },
+              {
+                max: 16,
+                required: true,
+              }
             ]}
           >
-            <Input size="large" type="password" placeholder="至少6位密码，区分大小写" />
-          </FormItem>
-        </Popover>
-        <FormItem
+          </ProFormText.Password>
+        <ProFormText.Password
+          label="密码确认"
           name="confirm"
           rules={[
             {
+              max: 16,
               required: true,
-              message: '确认密码',
             },
             {
               validator: checkConfirm,
             },
           ]}
         >
-          <Input size="large" type="password" placeholder="确认密码" />
-        </FormItem>
-        <InputGroup compact>
-          <Select
-            size="large"
-            value={prefix}
-            onChange={changePrefix}
-            style={{
-              width: '20%',
-            }}
-          >
-            <Option value="86">+86</Option>
-            <Option value="87">+87</Option>
-          </Select>
-          <FormItem
-            style={{
-              width: '80%',
-            }}
-            name="mobile"
-            rules={[
-              {
-                required: true,
-                message: '请输入手机号!',
-              },
-              {
-                pattern: /^\d{11}$/,
-                message: '手机号格式错误!',
-              },
-            ]}
-          >
-            <Input size="large" placeholder="手机号" />
-          </FormItem>
-        </InputGroup>
+        </ProFormText.Password>
         <Row gutter={8}>
           <Col span={16}>
-            <FormItem
+            <ProFormText
               name="captcha"
+              placeholder='请输入验证码'
               rules={[
                 {
                   required: true,
@@ -254,18 +201,15 @@ const Register = () => {
                 },
               ]}
             >
-              <Input size="large" placeholder="验证码" />
-            </FormItem>
+            </ProFormText>
           </Col>
           <Col span={8}>
-            <Button
-              size="large"
-              disabled={!!count}
-              className={styles.getCaptcha}
-              onClick={onGetCaptcha}
-            >
-              {count ? `${count} s` : '获取验证码'}
-            </Button>
+            <img
+                  title={'点击刷新验证码'}
+                  src={captchaUrl}
+                  style={{float: 'right',  cursor: 'pointer', width: 118, height: 30}}
+                  onClick={()=>{changeCaptcha()}}
+                />
           </Col>
         </Row>
         <FormItem>
@@ -275,6 +219,7 @@ const Register = () => {
             className={styles.submit}
             type="primary"
             htmlType="submit"
+
           >
             <span>注册</span>
           </Button>
@@ -282,7 +227,7 @@ const Register = () => {
             <span>使用已有账户登录</span>
           </Link>
         </FormItem>
-      </Form>
+      </ProForm>
     </div>
   );
 };

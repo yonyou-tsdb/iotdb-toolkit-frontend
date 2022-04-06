@@ -10,6 +10,7 @@ import connectionList from './en-US/connectionList';
 import manageUser from './en-US/manageUser';
 import createStorageGroup from './en-US/createStorageGroup';
 import query from './en-US/query';
+import account from './en-US/account';
 export default {
   'navBar.lang': 'Languages',
   'layout.user.link.help': 'Help',
@@ -31,4 +32,5 @@ export default {
   ...manageUser,
   ...createStorageGroup,
   ...query,
+  ...account,
 };

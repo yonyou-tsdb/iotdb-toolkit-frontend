@@ -10,6 +10,7 @@ import connectionList from './zh-CN/connectionList';
 import manageUser from './zh-CN/manageUser';
 import createStorageGroup from './zh-CN/createStorageGroup';
 import query from './zh-CN/query';
+import account from './zh-CN/account';
 export default {
   'navBar.lang': '语言',
   'layout.user.link.help': '帮助',
@@ -31,4 +32,5 @@ export default {
   ...manageUser,
   ...createStorageGroup,
   ...query,
+  ...account,
 };
