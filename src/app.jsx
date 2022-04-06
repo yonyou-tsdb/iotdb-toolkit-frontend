@@ -8,7 +8,7 @@ import { connectionLessUsingPOST, } from '@/services/swagger1/connectionControll
 import { BookOutlined, LinkOutlined } from '@ant-design/icons';
 const isDev = process.env.NODE_ENV === 'development';
 const loginPath = '/user/login';
-const registerPath = '/user/register';
+const anonPath = [loginPath, '/user/register', '/user/register-success', '/user/register-fail'];
 /** 获取用户信息比较慢的时候会展示一个 loading */
 
 export const initialStateConfig = {
@@ -118,7 +118,8 @@ export const layout = ({ initialState }) => {
       const { location } = history; // 如果没有登录，重定向到 login
 
       if (!initialState?.currentUser
-          && location.pathname !== loginPath && location.pathname !== registerPath) {
+          && anonPath.indexOf(location.pathname) < 0
+        ) {
         history.push(loginPath);
       }
     },

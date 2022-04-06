@@ -43,6 +43,8 @@ export default {
   'menu.profile.basic': 'Basic Profile',
   'menu.profile.advanced': 'Advanced Profile',
   'menu.register-result': 'Register Result',
+  'menu.register-success': 'Register Success',
+  'menu.register-fail': 'Register Fail',
   'menu.result': 'Result',
   'menu.result.success': 'Success',
   'menu.result.fail': 'Fail',

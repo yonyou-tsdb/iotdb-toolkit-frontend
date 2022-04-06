@@ -43,10 +43,16 @@ export default defineConfig({
           component: './User/Login',
         },
         {
-          name: 'register-result',
+          name: 'register-success',
           icon: 'smile',
-          path: '/user/register-result',
-          component: './user/register-result',
+          path: '/user/register-success',
+          component: './user/register-success',
+        },
+        {
+          name: 'register-fail',
+          icon: 'smile',
+          path: '/user/register-fail',
+          component: './user/register-fail',
         },
         {
           name: 'register',
