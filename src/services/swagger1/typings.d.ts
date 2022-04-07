@@ -21,6 +21,10 @@ declare namespace API {
     id?: Record<string, any>;
   };
 
+  type EmailLogFace = {
+    id?: Record<string, any>;
+  };
+
   type JSONObject = true;
 
   type QueryFace = {
@@ -30,6 +34,8 @@ declare namespace API {
   type User = {
     connect?: ConnectFace[];
     connectMap?: Record<string, any>;
+    emailLog?: EmailLogFace[];
+    emailLogMap?: Record<string, any>;
     id?: number;
     name?: string;
     password?: string;

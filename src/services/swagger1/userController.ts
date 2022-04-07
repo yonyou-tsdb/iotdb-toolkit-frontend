@@ -2,8 +2,8 @@
 /* eslint-disable */
 import { request } from 'umi';
 
-/** sendRegisterEmail GET /api/acquireCaptcha */
-export async function sendRegisterEmailUsingGET(
+/** acquireCaptcha GET /api/acquireCaptcha */
+export async function acquireCaptchaUsingGET(
   params: {
     // query
     /** token */
@@ -18,6 +18,25 @@ export async function sendRegisterEmailUsingGET(
     params: {
       ...queryParams,
     },
+    ...(options || {}),
+  });
+}
+
+/** activateAccount GET /api/activateAccount/${param0}/${param1} */
+export async function activateAccountUsingGET(
+  params: {
+    // path
+    /** elId */
+    elId: number;
+    /** token */
+    token: string;
+  },
+  options?: { [key: string]: any },
+) {
+  const { elId: param0, token: param1, ...queryParams } = params;
+  return request<any>(`/api/activateAccount/${param0}/${param1}`, {
+    method: 'GET',
+    params: { ...queryParams },
     ...(options || {}),
   });
 }
@@ -182,22 +201,22 @@ export async function registerUsingPOST(
   });
 }
 
-/** sendRegisterEmail GET /api/sendRegisterEmail */
-export async function sendRegisterEmailUsingGET1(
+/** sendResetPasswordMail GET /api/sendResetPasswordMail */
+export async function sendResetPasswordMailUsingGET(
   params: {
     // query
-    /** username */
-    username?: string;
-    /** password */
-    password?: string;
     /** email */
     email: string;
+    /** captcha */
+    captcha: string;
+    /** token */
+    token: string;
     // path
   },
   options?: { [key: string]: any },
 ) {
   const { ...queryParams } = params;
-  return request<API.BaseVOJSONObject_>('/api/sendRegisterEmail', {
+  return request<API.BaseVOJSONObject_>('/api/sendResetPasswordMail', {
     method: 'GET',
     params: {
       ...queryParams,
@@ -206,22 +225,22 @@ export async function sendRegisterEmailUsingGET1(
   });
 }
 
-/** sendRegisterEmail POST /api/sendRegisterEmail */
-export async function sendRegisterEmailUsingPOST(
+/** sendResetPasswordMail POST /api/sendResetPasswordMail */
+export async function sendResetPasswordMailUsingPOST(
   params: {
     // query
-    /** username */
-    username?: string;
-    /** password */
-    password?: string;
     /** email */
     email: string;
+    /** captcha */
+    captcha: string;
+    /** token */
+    token: string;
     // path
   },
   options?: { [key: string]: any },
 ) {
   const { ...queryParams } = params;
-  return request<API.BaseVOJSONObject_>('/api/sendRegisterEmail', {
+  return request<API.BaseVOJSONObject_>('/api/sendResetPasswordMail', {
     method: 'POST',
     params: {
       ...queryParams,

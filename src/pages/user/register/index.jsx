@@ -1,11 +1,13 @@
 import { useState, useEffect, useRef } from 'react';
 import { Form, Button, Col, Input, Popover, Progress, Row, Select, message, notification } from 'antd';
+import { LockOutlined, } from '@ant-design/icons';
 import { Link, useRequest, history, useIntl } from 'umi';
 import ProForm, { ProFormCaptcha, ProFormCheckbox, ProFormText } from '@ant-design/pro-form';
 import { registerUsingPOST } from '@/services/swagger1/userController';
 import styles from './style.less';
 import defaultCaptchaImg from '../../../assets/captcha-pure.png';
 import { v4 as uuid } from 'uuid';
+import md5 from 'js-md5';
 const FormItem = Form.Item;
 const { Option } = Select;
 const InputGroup = Input.Group;
@@ -77,8 +79,8 @@ const Register = () => {
     changeCaptchaToDefault();
     let tokenRefCurrent = tokenRef.current;
     setToken(null);
+    values.password = md5(values.password);
     let ret = await registerUsingPOST({...values, token: tokenRefCurrent});
-    console.log(ret);
     if(ret.code=='0'){
       notification.success({
         message: '注册邮件已经发送至邮箱中，请您于24小时内激活账号',
@@ -163,6 +165,9 @@ const Register = () => {
               form.getFieldValue('password').length > 0 &&
               styles.password
             }
+            fieldProps={{
+              visibilityToggle: false,
+            }}
             rules={[
               {
                 pattern: /((?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{8,16})/,
@@ -178,6 +183,9 @@ const Register = () => {
         <ProFormText.Password
           label="密码确认"
           name="confirm"
+          fieldProps={{
+            visibilityToggle: false,
+          }}
           rules={[
             {
               max: 16,

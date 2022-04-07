@@ -7,12 +7,12 @@ import ProForm, { ProFormCaptcha, ProFormCheckbox, ProFormText } from '@ant-desi
 import { useIntl, Link, history, FormattedMessage, SelectLang, useModel } from 'umi';
 import Footer from '@/components/Footer';
 import { login } from '@/services/ant-design-pro/api';
-import { loginAccountUsingPOST } from '@/services/swagger1/userController';
+import { loginAccountUsingPOST, sendResetPasswordMailUsingPOST } from '@/services/swagger1/userController';
 import styles from './index.less';
 import defaultCaptchaImg from '../../../assets/captcha-pure.png';
 import { v4 as uuid } from 'uuid';
 import CookieUtil from '../../../utils/CookieUtil';
-const defaultUsername = "admin";
+import md5 from 'js-md5';
 const Login = () => {
   const { getItem, addItem } = CookieUtil;
   const { initialState, setInitialState } = useModel('@@initialState');
@@ -69,7 +69,7 @@ const Login = () => {
     setSubmitting(true);
     try {
       // 登录
-      console.log(values);
+      values.password = md5(values.password);
       let msg = await loginAccountUsingPOST({ ...values, type });
       let errorMsg = msg.message;
       msg = msg.data == null ? msg : msg.data;
@@ -93,7 +93,6 @@ const Login = () => {
         message: defaultloginFailureMessage,
         description: errorMsg,
       });
-      // setUserLoginState(msg);
     } catch (error) {
       const defaultloginFailureMessage = intl.formatMessage({
         id: 'pages.login.failure',
@@ -103,6 +102,27 @@ const Login = () => {
 
     setSubmitting(false);
   };
+  const handleReset = async (values) => {
+    if(token == null){
+      return;
+    }
+    console.log(values);
+    changeCaptchaToDefault();
+    let tokenRefCurrent = tokenRef.current;
+    setToken(null);
+    console.log(tokenRefCurrent);
+    let ret = await sendResetPasswordMailUsingPOST({...values, token: tokenRefCurrent});
+    console.log(ret);
+    if(ret.code=='0'){
+      notification.success({
+        message: '找回密码邮件已经发送至邮箱中，请您于24小时内进行操作',
+      });
+    }else{
+      notification.error({
+        message: ret.message,
+      });
+    }
+  }
   const changeCaptcha = () => {
     let tabToken = uuid().replaceAll('-','');
     setToken(tabToken);
@@ -163,7 +183,7 @@ const Login = () => {
               if(type === 'account'){
                 handleSubmit(values);
               }else{
-                console.log(values)
+                handleReset(values);
               }
             }}
             form={form}
@@ -217,6 +237,7 @@ const Login = () => {
                   fieldProps={{
                     size: 'large',
                     prefix: <LockOutlined className={styles.prefixIcon} />,
+                    visibilityToggle: false,
                   }}
                   placeholder={intl.formatMessage({
                     id: 'pages.login.password.placeholder',
