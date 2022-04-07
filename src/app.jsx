@@ -8,7 +8,8 @@ import { connectionLessUsingPOST, } from '@/services/swagger1/connectionControll
 import { BookOutlined, LinkOutlined } from '@ant-design/icons';
 const isDev = process.env.NODE_ENV === 'development';
 const loginPath = '/user/login';
-const anonPath = [loginPath, '/user/register', '/user/register-success', '/user/register-fail'];
+const anonPath = [loginPath, '/user/register', '/user/register-success',
+'/user/register-fail', '/user/reset-success', '/user/reset-fail'];
 /** 获取用户信息比较慢的时候会展示一个 loading */
 
 export const initialStateConfig = {

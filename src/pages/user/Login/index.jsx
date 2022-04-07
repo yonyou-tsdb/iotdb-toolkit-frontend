@@ -1,28 +1,31 @@
-import {
-  GithubOutlined,
-  ReadOutlined,
-  LockOutlined,
-  MobileOutlined,
-  TaobaoCircleOutlined,
-  UserOutlined,
-  WeiboCircleOutlined,
+import { GithubOutlined, ReadOutlined, LockOutlined, TaobaoCircleOutlined, UserOutlined,
+  WeiboCircleOutlined, MailOutlined, EditOutlined,
 } from '@ant-design/icons';
-import { Alert, Space, message, Tabs, notification, Checkbox, Form } from 'antd';
-import React, { useState } from 'react';
+import { Alert, Space, message, Tabs, notification, Checkbox, Form, Row, Col } from 'antd';
+import React, { useState, useEffect, useRef } from 'react';
 import ProForm, { ProFormCaptcha, ProFormCheckbox, ProFormText } from '@ant-design/pro-form';
 import { useIntl, Link, history, FormattedMessage, SelectLang, useModel } from 'umi';
 import Footer from '@/components/Footer';
 import { login } from '@/services/ant-design-pro/api';
 import { loginAccountUsingPOST } from '@/services/swagger1/userController';
-import { getFakeCaptcha } from '@/services/ant-design-pro/login';
 import styles from './index.less';
+import defaultCaptchaImg from '../../../assets/captcha-pure.png';
+import { v4 as uuid } from 'uuid';
 import CookieUtil from '../../../utils/CookieUtil';
+const defaultUsername = "admin";
 const Login = () => {
   const { getItem, addItem } = CookieUtil;
+  const { initialState, setInitialState } = useModel('@@initialState');
   const [submitting, setSubmitting] = useState(false);
   const [userLoginState, setUserLoginState] = useState({});
   const [type, setType] = useState('account');
-  const { initialState, setInitialState } = useModel('@@initialState');
+  const initToken = uuid().replaceAll('-','');
+  const [token, setToken] = useState(initToken);
+  const tokenRef = useRef(initToken);
+  useEffect(() => {
+    tokenRef.current = token
+  }, [token]);
+  const [captchaUrl, setCaptchaUrl] = useState('../api/acquireCaptcha?token='+tokenRef.current);
   const intl = useIntl();
   const LoginMessage = ({ content }) => (
     <Alert
@@ -66,6 +69,7 @@ const Login = () => {
     setSubmitting(true);
     try {
       // 登录
+      console.log(values);
       let msg = await loginAccountUsingPOST({ ...values, type });
       let errorMsg = msg.message;
       msg = msg.data == null ? msg : msg.data;
@@ -73,7 +77,6 @@ const Login = () => {
         if(msg.defaultConnect==null){
           const defaultloginSuccessMessage = intl.formatMessage({
             id: 'pages.login.success-without-tenant',
-            defaultMessage: '登录成功，请指定要管理的数据源',
           });
           message.success(defaultloginSuccessMessage);
         }else{
@@ -85,7 +88,6 @@ const Login = () => {
       } // 如果失败去设置用户错误信息
       const defaultloginFailureMessage = intl.formatMessage({
         id: 'pages.login.failure',
-        defaultMessage: '登录失败',
       });
       notification.error({
         message: defaultloginFailureMessage,
@@ -95,14 +97,21 @@ const Login = () => {
     } catch (error) {
       const defaultloginFailureMessage = intl.formatMessage({
         id: 'pages.login.failure',
-        defaultMessage: '登录失败',
       });
       message.error(defaultloginFailureMessage);
     }
 
     setSubmitting(false);
   };
+  const changeCaptcha = () => {
+    let tabToken = uuid().replaceAll('-','');
+    setToken(tabToken);
+    setCaptchaUrl('../api/acquireCaptcha?token='+tabToken);
+  }
 
+  const changeCaptchaToDefault = () => {
+    setCaptchaUrl(defaultCaptchaImg);
+  }
   const { status, type: loginType } = userLoginState;
   const [form] = Form.useForm();
   return (
@@ -138,8 +147,7 @@ const Login = () => {
             submitter={{
               searchConfig: {
                 submitText: intl.formatMessage({
-                  id: 'pages.login.submit',
-                  defaultMessage: '登录',
+                  id: type === 'account'?'pages.login.submit':'pages.reset.submit',
                 }),
               },
               render: (_, dom) => dom.pop(),
@@ -152,7 +160,11 @@ const Login = () => {
               },
             }}
             onFinish={async (values) => {
-              handleSubmit(values);
+              if(type === 'account'){
+                handleSubmit(values);
+              }else{
+                console.log(values)
+              }
             }}
             form={form}
           >
@@ -164,11 +176,10 @@ const Login = () => {
                 })}
               />
               <Tabs.TabPane
-                key="mobile"
+                key="reset"
                 tab={intl.formatMessage({
                   id: 'pages.login.forgotPassword',
                 })}
-                disabled={true}
               />
             </Tabs>
 
@@ -216,7 +227,6 @@ const Login = () => {
                       message: (
                         <FormattedMessage
                           id="pages.login.password.required"
-                          defaultMessage="请输入密码！"
                         />
                       ),
                     },
@@ -225,89 +235,64 @@ const Login = () => {
               </>
             )}
 
-            {status === 'error' && loginType === 'mobile' && <LoginMessage content="验证码错误" />}
-            {type === 'mobile' && (
+            {status === 'error' && loginType === 'reset' && <LoginMessage content="验证码错误" />}
+            {type === 'reset' && (
               <>
                 <ProFormText
                   fieldProps={{
                     size: 'large',
-                    prefix: <MobileOutlined className={styles.prefixIcon} />,
+                    prefix: <MailOutlined className={styles.prefixIcon} />,
                   }}
-                  name="mobile"
+                  name="email"
                   placeholder={intl.formatMessage({
-                    id: 'pages.login.phoneNumber.placeholder',
-                    defaultMessage: '手机号',
+                    id: 'pages.reset.email.placeholder',
                   })}
                   rules={[
                     {
                       required: true,
                       message: (
                         <FormattedMessage
-                          id="pages.login.phoneNumber.required"
-                          defaultMessage="请输入手机号！"
+                          id="pages.reset.email.placeholder"
                         />
                       ),
                     },
                     {
-                      pattern: /^1\d{10}$/,
+                      type: 'email',
                       message: (
                         <FormattedMessage
-                          id="pages.login.phoneNumber.invalid"
-                          defaultMessage="手机号格式错误！"
+                          id="pages.reset.email.invalid"
                         />
                       ),
                     },
                   ]}
                 />
-                <ProFormCaptcha
+              <Row gutter={8}>
+                <Col span={16}>
+                <ProFormText
                   fieldProps={{
                     size: 'large',
-                    prefix: <LockOutlined className={styles.prefixIcon} />,
-                  }}
-                  captchaProps={{
-                    size: 'large',
-                  }}
-                  placeholder={intl.formatMessage({
-                    id: 'pages.login.captcha.placeholder',
-                    defaultMessage: '请输入验证码',
-                  })}
-                  captchaTextRender={(timing, count) => {
-                    if (timing) {
-                      return `${count} ${intl.formatMessage({
-                        id: 'pages.getCaptchaSecondText',
-                        defaultMessage: '获取验证码',
-                      })}`;
-                    }
-
-                    return intl.formatMessage({
-                      id: 'pages.login.phoneLogin.getVerificationCode',
-                      defaultMessage: '获取验证码',
-                    });
+                    prefix: <EditOutlined className={styles.prefixIcon} />,
                   }}
                   name="captcha"
+                  placeholder='请输入验证码'
                   rules={[
                     {
                       required: true,
-                      message: (
-                        <FormattedMessage
-                          id="pages.login.captcha.required"
-                          defaultMessage="请输入验证码！"
-                        />
-                      ),
+                      message: '请输入验证码',
                     },
                   ]}
-                  onGetCaptcha={async (phone) => {
-                    const result = await getFakeCaptcha({
-                      phone:form.getFieldValue('mobile'),
-                    });
-
-                    if (result === false) {
-                      return;
-                    }
-
-                    message.success('获取验证码成功！验证码为：1234');
-                  }}
+                >
+                </ProFormText>
+                </Col>
+                <Col span={8}>
+                <img
+                  title={'点击刷新验证码'}
+                  src={type === 'reset'?captchaUrl:defaultCaptchaImg}
+                  style={{float: 'right',  cursor: 'pointer', width: 108, height: 39}}
+                  onClick={()=>{changeCaptcha()}}
                 />
+                </Col>
+              </Row>
               </>
             )}
             <div

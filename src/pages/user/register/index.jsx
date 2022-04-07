@@ -145,11 +145,11 @@ const Register = () => {
             },
             {
               required: true,
-              message: '请输入邮箱地址!',
+              message: '请输入邮箱地址',
             },
             {
               type: 'email',
-              message: '邮箱地址格式错误!',
+              message: '邮箱地址格式错误',
             },
           ]}
         >

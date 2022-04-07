@@ -45,6 +45,8 @@ export default {
   'menu.register-result': 'Register Result',
   'menu.register-success': 'Register Success',
   'menu.register-fail': 'Register Fail',
+  'menu.reset-success': 'Reset Password Success',
+  'menu.reset-fail': 'Reset Password Fail',
   'menu.result': 'Result',
   'menu.result.success': 'Success',
   'menu.result.fail': 'Fail',
