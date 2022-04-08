@@ -212,7 +212,11 @@ const GlobalHeaderRight = () => {
             label={useIntl().formatMessage({
               id: 'header.datasource-manage.password',
             })}
+
             name="connectionPassword"
+            fieldProps={{
+              visibilityToggle: false,
+            }}
             placeholder={useIntl().formatMessage({
               id: 'header.datasource-manage.password.require',
             })}

@@ -316,6 +316,50 @@ export async function sendResetPasswordMailUsingPOST(
   });
 }
 
+/** updatePassword GET /api/updatePassword */
+export async function updatePasswordUsingGET(
+  params: {
+    // query
+    /** passwordOrigin */
+    passwordOrigin: string;
+    /** password */
+    password: string;
+    // path
+  },
+  options?: { [key: string]: any },
+) {
+  const { ...queryParams } = params;
+  return request<API.BaseVOJSONObject_>('/api/updatePassword', {
+    method: 'GET',
+    params: {
+      ...queryParams,
+    },
+    ...(options || {}),
+  });
+}
+
+/** updatePassword POST /api/updatePassword */
+export async function updatePasswordUsingPOST(
+  params: {
+    // query
+    /** passwordOrigin */
+    passwordOrigin: string;
+    /** password */
+    password: string;
+    // path
+  },
+  options?: { [key: string]: any },
+) {
+  const { ...queryParams } = params;
+  return request<API.BaseVOJSONObject_>('/api/updatePassword', {
+    method: 'POST',
+    params: {
+      ...queryParams,
+    },
+    ...(options || {}),
+  });
+}
+
 /** connect connect GET /connect */
 export async function connectUsingGET(
   params: {

@@ -71,9 +71,7 @@ const ResetPassword = ({ location }) => {
   const onFinish = async (values) => {
     setSubmitting(true);
     values.password = md5(values.password);
-    console.log({password:values.password, id:id, token:token});
     let ret = await resetUpdatePasswordUsingPOST({password:values.password, id:id, token:token});
-    console.log(ret.code)
     if(ret.code=='0'){
       notification.success({
         message: '密码修改成功',

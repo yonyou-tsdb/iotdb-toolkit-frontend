@@ -29,23 +29,7 @@ const AvatarDropdown = ({ menu }) => {
       setInitialState({ ...initialState, currentUser: undefined });
       loginOut();
       return;
-    }else if (key === 'stopExport' && initialState) {
-      if(initialState.ws!=null){
-        initialState.ws.send("EXPORT_INTERRUPT");
-      }
-      return;
-    }else if (key === 'fetchJobs' && initialState) {
-      if(initialState.ws!=null){
-        initialState.ws.send("FETCH_JOBS");
-      }
-      return;
-    }else if (key === 'addJob' && initialState) {
-      if(initialState.ws!=null){
-        initialState.ws.send("EXPORT_START");
-      }
-      return;
-    }
-    else{
+    }else if(key === 'setting' && initialState){
       history.push('/account/settings');
     }
   }
@@ -71,6 +55,12 @@ const AvatarDropdown = ({ menu }) => {
 
   const menuHeaderDropdown = (
     <Menu className={styles.menu} selectedKeys={[]} onClick={onMenuClick}>
+      <Menu.Item key="setting">
+        <SettingOutlined />
+        {intl.formatMessage({
+          id: 'menu.account.setting',
+        })}
+      </Menu.Item>
       <Menu.Item key="logout">
         <LogoutOutlined />
         {intl.formatMessage({

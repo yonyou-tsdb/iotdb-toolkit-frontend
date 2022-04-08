@@ -1,6 +1,6 @@
 import React from 'react';
 import { UploadOutlined } from '@ant-design/icons';
-import { Button, Input, Upload, message } from 'antd';
+import { Button, Input, Upload, message, Form, notification } from 'antd';
 import ProForm, {
   ProFormDependency,
   ProFormFieldSet,
@@ -8,70 +8,46 @@ import ProForm, {
   ProFormText,
   ProFormTextArea,
 } from '@ant-design/pro-form';
-import { useRequest } from 'umi';
-import { queryCurrent } from '../service';
-import { queryProvince, queryCity } from '../service';
+import { history, useModel, useIntl, useRequest  } from 'umi';
+import { updatePasswordUsingPOST } from '@/services/swagger1/userController';
+import md5 from 'js-md5';
 import styles from './BaseView.less';
 
-const validatorPhone = (rule, value, callback) => {
-  const values = value.split('-');
-
-  if (!values[0]) {
-    callback('Please input your area code!');
-  }
-
-  if (!values[1]) {
-    callback('Please input your phone number!');
-  }
-
-  callback();
-}; // 头像组件 方便以后独立，增加裁剪之类的功能
-
-const AvatarView = ({ avatar }) => (
-  <>
-    <div className={styles.avatar_title}>头像</div>
-    <div className={styles.avatar}>
-      <img src={avatar} alt="avatar" />
-    </div>
-    <Upload showUploadList={false}>
-      <div className={styles.button_view}>
-        <Button>
-          <UploadOutlined />
-          更换头像
-        </Button>
-      </div>
-    </Upload>
-  </>
-);
-
 const BaseView = () => {
-  const { data: currentUser, loading } = useRequest(() => {
-    return queryCurrent();
-  });
+  const { initialState, setInitialState } = useModel('@@initialState');
+  const { currentUser } = initialState;
+  const [form] = Form.useForm();
+  const handleFinish = async (values) => {
+    const encodePasswordOrigin = md5(values.passwordOrigin);
+    const encodePassword = md5(values.password);
+    let ret = await updatePasswordUsingPOST({passwordOrigin:encodePasswordOrigin,
+       password: encodePassword});
+    if(ret.code=='0'){
+     notification.success({
+       message: '密码修改成功',
+     });
+    }else{
+     notification.error({
+       message: ret.message,
+     });
+    }
+  };
+  const checkConfirm = (_, value) => {
+    const promise = Promise;
 
-  const getAvatarURL = () => {
-    if (currentUser) {
-      if (currentUser.avatar) {
-        return currentUser.avatar;
-      }
-
-      const url = 'https://gw.alipayobjects.com/zos/rmsportal/BiazfanxmamNRoxxVxka.png';
-      return url;
+    if (value && value !== form.getFieldValue('password')) {
+      return promise.reject('两次输入的密码不匹配!');
     }
 
-    return '';
+    return promise.resolve();
   };
-
-  const handleFinish = async () => {
-    message.success('更新基本信息成功');
-  };
-
   return (
     <div className={styles.baseView}>
-      {loading ? null : (
+      {(
         <>
           <div className={styles.left}>
             <ProForm
+              form={form}
               layout="vertical"
               onFinish={handleFinish}
               submitter={{
@@ -84,152 +60,65 @@ const BaseView = () => {
                   children: '更新基本信息',
                 },
               }}
-              initialValues={{ ...currentUser, phone: currentUser?.phone.split('-') }}
+              initialValues={{ ...currentUser }}
               hideRequiredMark
             >
-              <ProFormText
-                width="md"
-                name="email"
-                label="邮箱"
+            <ProFormText.Password
+              label="原密码"
+              name="passwordOrigin"
+              initialValue=" "
+              fieldProps={{
+                visibilityToggle: false,
+              }}
+              rules={[
+                {
+                  pattern: /((?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{8,16})/,
+                  message: '请输入至少8位包含数字和大小写字母的密码',
+                },
+                {
+                  max: 16,
+                  required: true,
+                }
+              ]}
+            >
+            </ProFormText.Password>
+              <ProFormText.Password
+                label="新密码"
+                name="password"
+                initialValue=" "
+                fieldProps={{
+                  visibilityToggle: false,
+                }}
                 rules={[
                   {
+                    pattern: /((?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{8,16})/,
+                    message: '请输入至少8位包含数字和大小写字母的密码',
+                  },
+                  {
+                    max: 16,
                     required: true,
-                    message: '请输入您的邮箱!',
-                  },
-                ]}
-              />
-              <ProFormText
-                width="md"
-                name="name"
-                label="昵称"
-                rules={[
-                  {
-                    required: true,
-                    message: '请输入您的昵称!',
-                  },
-                ]}
-              />
-              <ProFormTextArea
-                name="profile"
-                label="个人简介"
-                rules={[
-                  {
-                    required: true,
-                    message: '请输入个人简介!',
-                  },
-                ]}
-                placeholder="个人简介"
-              />
-              <ProFormSelect
-                width="sm"
-                name="country"
-                label="国家/地区"
-                rules={[
-                  {
-                    required: true,
-                    message: '请输入您的国家或地区!',
-                  },
-                ]}
-                options={[
-                  {
-                    label: '中国',
-                    value: 'China',
-                  },
-                ]}
-              />
-
-              <ProForm.Group title="所在省市" size={8}>
-                <ProFormSelect
-                  rules={[
-                    {
-                      required: true,
-                      message: '请输入您的所在省!',
-                    },
-                  ]}
-                  width="sm"
-                  fieldProps={{
-                    labelInValue: true,
-                  }}
-                  name="province"
-                  className={styles.item}
-                  request={async () => {
-                    return queryProvince().then(({ data }) => {
-                      return data.map((item) => {
-                        return {
-                          label: item.name,
-                          value: item.id,
-                        };
-                      });
-                    });
-                  }}
-                />
-                <ProFormDependency name={['province']}>
-                  {({ province }) => {
-                    return (
-                      <ProFormSelect
-                        params={{
-                          key: province?.value,
-                        }}
-                        name="city"
-                        width="sm"
-                        rules={[
-                          {
-                            required: true,
-                            message: '请输入您的所在城市!',
-                          },
-                        ]}
-                        disabled={!province}
-                        className={styles.item}
-                        request={async () => {
-                          if (!province?.key) {
-                            return [];
-                          }
-
-                          return queryCity(province.key || '').then(({ data }) => {
-                            return data.map((item) => {
-                              return {
-                                label: item.name,
-                                value: item.id,
-                              };
-                            });
-                          });
-                        }}
-                      />
-                    );
-                  }}
-                </ProFormDependency>
-              </ProForm.Group>
-              <ProFormText
-                width="md"
-                name="address"
-                label="街道地址"
-                rules={[
-                  {
-                    required: true,
-                    message: '请输入您的街道地址!',
-                  },
-                ]}
-              />
-              <ProFormFieldSet
-                name="phone"
-                label="联系电话"
-                rules={[
-                  {
-                    required: true,
-                    message: '请输入您的联系电话!',
-                  },
-                  {
-                    validator: validatorPhone,
-                  },
+                  }
                 ]}
               >
-                <Input className={styles.area_code} />
-                <Input className={styles.phone_number} />
-              </ProFormFieldSet>
+              </ProFormText.Password>
+            <ProFormText.Password
+              label="密码确认"
+              name="confirm"
+              fieldProps={{
+                visibilityToggle: false,
+              }}
+              rules={[
+                {
+                  max: 16,
+                  required: true,
+                },
+                {
+                  validator: checkConfirm,
+                },
+              ]}
+            >
+            </ProFormText.Password>
             </ProForm>
-          </div>
-          <div className={styles.right}>
-            <AvatarView avatar={getAvatarURL()} />
           </div>
         </>
       )}
