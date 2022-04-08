@@ -25,7 +25,10 @@ const Login = () => {
   useEffect(() => {
     tokenRef.current = token
   }, [token]);
-  const [captchaUrl, setCaptchaUrl] = useState('../api/acquireCaptcha?token='+tokenRef.current);
+  const [captchaUrl, setCaptchaUrl] = useState(
+    location.pathname.endsWith('/')?
+    '../../api/acquireCaptcha?token='+tokenRef.current:'../api/acquireCaptcha?token='+tokenRef.current
+  );
   const intl = useIntl();
   const LoginMessage = ({ content }) => (
     <Alert
@@ -46,14 +49,7 @@ const Login = () => {
     }
   };
   const goto = () => {
-
-    if (!history) return;
-    setTimeout(() => {
-      const { query } = history.location;
-      const { redirect } = query;
-      history.replace(redirect || '/');
-      // window.location = window.location.protocol + '//' + window.location.host + '/list/connection-list';
-    }, 10);
+    window.location = window.location.protocol + '//' + window.location.host + '/list/connection-list';
   };
   const selectConnection = (item) => {
     const jsessionid = getItem('JSESSIONID');
@@ -103,16 +99,11 @@ const Login = () => {
     setSubmitting(false);
   };
   const handleReset = async (values) => {
-    if(token == null){
-      return;
-    }
-    console.log(values);
+    setSubmitting(true);
     changeCaptchaToDefault();
     let tokenRefCurrent = tokenRef.current;
     setToken(null);
-    console.log(tokenRefCurrent);
     let ret = await sendResetPasswordMailUsingPOST({...values, token: tokenRefCurrent});
-    console.log(ret);
     if(ret.code=='0'){
       notification.success({
         message: '找回密码邮件已经发送至邮箱中，请您于24小时内进行操作',
@@ -122,13 +113,30 @@ const Login = () => {
         message: ret.message,
       });
     }
+    setSubmitting(false);
   }
   const changeCaptcha = () => {
     let tabToken = uuid().replaceAll('-','');
     setToken(tabToken);
-    setCaptchaUrl('../api/acquireCaptcha?token='+tabToken);
+    setCaptchaUrl(location.pathname.endsWith('/')?
+      '../../api/acquireCaptcha?token='+tabToken:
+      '../api/acquireCaptcha?token='+tabToken
+    );
   }
+  const checkToken = (_, value) => {
+    const promise = Promise;
+    if (value == null) {
+      return promise.reject('请输入验证码');
+    }
+    if (value.length > 20) {
+      return promise.reject('验证码过长');
+    }
+    if (token == null) {
+      return promise.reject('点击获取验证码');
+    }
 
+    return promise.resolve();
+  };
   const changeCaptchaToDefault = () => {
     setCaptchaUrl(defaultCaptchaImg);
   }
@@ -298,8 +306,7 @@ const Login = () => {
                   placeholder='请输入验证码'
                   rules={[
                     {
-                      required: true,
-                      message: '请输入验证码',
+                      validator: checkToken,
                     },
                   ]}
                 >

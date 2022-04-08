@@ -117,9 +117,11 @@ export const layout = ({ initialState }) => {
     footerRender: () => <Footer />,
     onPageChange: () => {
       const { location } = history; // 如果没有登录，重定向到 login
-
-      if (!initialState?.currentUser
-          && anonPath.indexOf(location.pathname) < 0
+      let pathname = location.pathname.endsWith('/') ?
+       location.pathname.substring(0, location.pathname.length - 1):
+       location.pathname;
+      if (initialState?.currentUser?.name == null
+          && anonPath.indexOf(pathname) < 0
         ) {
         history.push(loginPath);
       }

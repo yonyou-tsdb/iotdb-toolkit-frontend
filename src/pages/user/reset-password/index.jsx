@@ -3,7 +3,7 @@ import { Form, Button, Col, Input, Popover, Progress, Row, Select, message, noti
 import { LockOutlined, } from '@ant-design/icons';
 import { Link, useRequest, history, useIntl } from 'umi';
 import ProForm, { ProFormCaptcha, ProFormCheckbox, ProFormText } from '@ant-design/pro-form';
-import { registerUsingPOST } from '@/services/swagger1/userController';
+import { resetUpdatePasswordUsingPOST } from '@/services/swagger1/userController';
 import styles from './style.less';
 import defaultCaptchaImg from '../../../assets/captcha-pure.png';
 import { v4 as uuid } from 'uuid';
@@ -34,23 +34,16 @@ const passwordProgressMap = {
   poor: 'exception',
 };
 
-const Register = () => {
+const ResetPassword = ({ location }) => {
+  const username = location.query.username;
+  const id = location.query.id;
+  const token = location.query.token;
   const intl = useIntl();
   const [count, setCount] = useState(0);
   const [visible, setVisible] = useState(false);
   const [prefix, setPrefix] = useState('86');
   const [popover, setPopover] = useState(false);
   const [submitting, setSubmitting] = useState(false);
-  const initToken = uuid().replaceAll('-','');
-  const [token, setToken] = useState(initToken);
-  const tokenRef = useRef(initToken);
-  useEffect(() => {
-    tokenRef.current = token
-  }, [token]);
-  const [captchaUrl, setCaptchaUrl] = useState(
-    location.pathname.endsWith('/')?
-    '../../api/acquireCaptcha?token='+initToken:'../api/acquireCaptcha?token='+initToken
-  );
   const confirmDirty = false;
   let interval;
   const [form] = Form.useForm();
@@ -77,14 +70,13 @@ const Register = () => {
 
   const onFinish = async (values) => {
     setSubmitting(true);
-    changeCaptchaToDefault();
-    let tokenRefCurrent = tokenRef.current;
-    setToken(null);
     values.password = md5(values.password);
-    let ret = await registerUsingPOST({...values, token: tokenRefCurrent});
+    console.log({password:values.password, id:id, token:token});
+    let ret = await resetUpdatePasswordUsingPOST({password:values.password, id:id, token:token});
+    console.log(ret.code)
     if(ret.code=='0'){
       notification.success({
-        message: '注册邮件已经发送至邮箱中，请您于24小时内激活账号',
+        message: '密码修改成功',
       });
     }else{
       notification.error({
@@ -104,46 +96,19 @@ const Register = () => {
     return promise.resolve();
   };
 
-  const checkToken = (_, value) => {
-    const promise = Promise;
-    if (value == null) {
-      return promise.reject('请输入验证码');
-    }
-    if (value.length > 20) {
-      return promise.reject('验证码过长');
-    }
-    if (token == null) {
-      return promise.reject('点击获取验证码');
-    }
-
-    return promise.resolve();
-  };
-
-  const changeCaptcha = () => {
-    let tabToken = uuid().replaceAll('-','');
-    setToken(tabToken);
-    setCaptchaUrl(location.pathname.endsWith('/')?
-      '../../api/acquireCaptcha?token='+tabToken:
-      '../api/acquireCaptcha?token='+tabToken
-    );
-  }
-
-  const changeCaptchaToDefault = () => {
-    setCaptchaUrl(defaultCaptchaImg);
-  }
-
   return (
     <div className={styles.main}>
-      <h3>注册</h3>
-      <ProForm form={form} name="UserRegister" onFinish={onFinish}
+      <h3>修改密码</h3>
+      <ProForm form={form} name="UpdatePassword" onFinish={onFinish}
       submitter={{
         render: (_, dom) => {},
       }}
       >
         <ProFormText
           label="账号"
-          name="username"
           fieldProps={{
+            readOnly: 'readOnly',
+            value: username,
           }}
           rules={[
             {
@@ -154,24 +119,6 @@ const Register = () => {
             {
               pattern: /^(?!_)[a-zA-Z0-9_]+$/,
               message: intl.formatMessage({id: 'account.username.rule',}),
-            },
-          ]}
-        >
-        </ProFormText>
-        <ProFormText
-          label="邮箱"
-          name="mail"
-          rules={[
-            {
-              max: 100,
-            },
-            {
-              required: true,
-              message: '请输入邮箱地址',
-            },
-            {
-              type: 'email',
-              message: '邮箱地址格式错误',
             },
           ]}
         >
@@ -217,28 +164,6 @@ const Register = () => {
           ]}
         >
         </ProFormText.Password>
-        <Row gutter={8}>
-          <Col span={16}>
-            <ProFormText
-              name="captcha"
-              placeholder='请输入验证码'
-              rules={[
-                {
-                  validator: checkToken,
-                },
-              ]}
-            >
-            </ProFormText>
-          </Col>
-          <Col span={8}>
-            <img
-                  title={'点击刷新验证码'}
-                  src={captchaUrl}
-                  style={{float: 'right',  cursor: 'pointer', width: 118, height: 30}}
-                  onClick={()=>{changeCaptcha()}}
-                />
-          </Col>
-        </Row>
         <FormItem>
           <Button
             size="large"
@@ -248,10 +173,10 @@ const Register = () => {
             htmlType="submit"
 
           >
-            <span>注册</span>
+            <span>提交</span>
           </Button>
           <Link className={styles.login} to="/user/login">
-            <span>使用已有账户登录</span>
+            <span>返回登录页面</span>
           </Link>
         </FormItem>
       </ProForm>
@@ -259,4 +184,4 @@ const Register = () => {
   );
 };
 
-export default Register;
+export default ResetPassword;

@@ -43,6 +43,7 @@ export default {
   'menu.profile.basic': 'Basic Profile',
   'menu.profile.advanced': 'Advanced Profile',
   'menu.register-result': 'Register Result',
+  'menu.reset-password' : 'Reset Password',
   'menu.success': 'Operate Success',
   'menu.fail': 'Operate Fail',
   'menu.result': 'Result',

@@ -64,7 +64,7 @@ export default defineConfig({
           name: 'reset-password',
           icon: 'smile',
           path: '/user/reset-password',
-          component: './user/success',
+          component: './user/reset-password',
         },
         {
           component: '404',

@@ -43,6 +43,7 @@ export default {
   'menu.profile.basic': '基础详情页',
   'menu.profile.advanced': '高级详情页',
   'menu.register-result': '注册结果页',
+  'menu.reset-password' : '重置密码',
   'menu.success': '操作成功',
   'menu.fail': '操作失败',
   'menu.result': '结果页',

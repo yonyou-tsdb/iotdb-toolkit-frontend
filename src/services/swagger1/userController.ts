@@ -201,6 +201,73 @@ export async function registerUsingPOST(
   });
 }
 
+/** resetPassword GET /api/resetPassword/${param0}/${param1} */
+export async function resetPasswordUsingGET(
+  params: {
+    // path
+    /** elId */
+    elId: number;
+    /** token */
+    token: string;
+  },
+  options?: { [key: string]: any },
+) {
+  const { elId: param0, token: param1, ...queryParams } = params;
+  return request<any>(`/api/resetPassword/${param0}/${param1}`, {
+    method: 'GET',
+    params: { ...queryParams },
+    ...(options || {}),
+  });
+}
+
+/** resetUpdatePassword GET /api/resetUpdatePassword */
+export async function resetUpdatePasswordUsingGET(
+  params: {
+    // query
+    /** id */
+    id: number;
+    /** token */
+    token: string;
+    /** password */
+    password: string;
+    // path
+  },
+  options?: { [key: string]: any },
+) {
+  const { ...queryParams } = params;
+  return request<API.BaseVOJSONObject_>('/api/resetUpdatePassword', {
+    method: 'GET',
+    params: {
+      ...queryParams,
+    },
+    ...(options || {}),
+  });
+}
+
+/** resetUpdatePassword POST /api/resetUpdatePassword */
+export async function resetUpdatePasswordUsingPOST(
+  params: {
+    // query
+    /** id */
+    id: number;
+    /** token */
+    token: string;
+    /** password */
+    password: string;
+    // path
+  },
+  options?: { [key: string]: any },
+) {
+  const { ...queryParams } = params;
+  return request<API.BaseVOJSONObject_>('/api/resetUpdatePassword', {
+    method: 'POST',
+    params: {
+      ...queryParams,
+    },
+    ...(options || {}),
+  });
+}
+
 /** sendResetPasswordMail GET /api/sendResetPasswordMail */
 export async function sendResetPasswordMailUsingGET(
   params: {
