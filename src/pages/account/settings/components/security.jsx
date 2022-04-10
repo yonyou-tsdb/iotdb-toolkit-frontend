@@ -1,45 +1,44 @@
 import React from 'react';
-import { List } from 'antd';
-const passwordStrength = {
-  strong: <span className="strong">强</span>,
-  medium: <span className="medium">中</span>,
-  weak: <span className="weak">弱 Weak</span>,
-};
-
+import { List, Modal, notification } from 'antd';
+import { history, useModel, useIntl, useRequest  } from 'umi';
+import { deleteAccountUsingPOST } from '@/services/swagger1/userController';
 const SecurityView = () => {
+  const { initialState, setInitialState } = useModel('@@initialState');
+  const { currentUser } = initialState;
   const getData = () => [
     {
-      title: '账户密码',
+      title: '删除账号',
       description: (
         <>
-          当前密码强度：
-          {passwordStrength.strong}
+          当前帐号：
+          {(currentUser!=null && currentUser.name!=null)?currentUser.name:''}
         </>
       ),
-      actions: [<a key="Modify">修改</a>],
-    },
-    {
-      title: '密保手机',
-      description: `已绑定手机：138****8293`,
-      actions: [<a key="Modify">修改</a>],
-    },
-    {
-      title: '密保问题',
-      description: '未设置密保问题，密保问题可有效保护账户安全',
-      actions: [<a key="Set">设置</a>],
-    },
-    {
-      title: '备用邮箱',
-      description: `已绑定邮箱：ant***sign.com`,
-      actions: [<a key="Modify">修改</a>],
-    },
-    {
-      title: 'MFA 设备',
-      description: '未绑定 MFA 设备，绑定后，可以进行二次确认',
-      actions: [<a key="bind">绑定</a>],
+      actions: [<a key="Delete" onClick={deleteAccount}>删除</a>],
     },
   ];
-
+  const deleteAccount = () => {
+    Modal.confirm({
+      title: '删除账号',
+      content: '是否删除此账号及相关一切内容？（不可恢复）',
+      onOk: () => deleteAccountConfirm(),
+    });
+  }
+  const deleteAccountConfirm = async () => {
+    let ret = await deleteAccountUsingPOST();
+    if(ret.code=='0'){
+      notification.success({
+        message: ((currentUser!=null && currentUser.name!=null)?currentUser.name:'') + '账号成功删除',
+      });
+      history.push({
+        pathname: '/user/login',
+      });
+    }else{
+      notification.error({
+        message: ret.message,
+      });
+    }
+  }
   const data = getData();
   return (
     <>

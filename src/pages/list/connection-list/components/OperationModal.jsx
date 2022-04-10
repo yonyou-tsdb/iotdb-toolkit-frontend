@@ -82,7 +82,7 @@ const { done, visible, current, onDone, onSubmit, children, isReadonly, doneResu
               {
                 required: true,
                 max: 15,
-                message: (useIntl().formatMessage({
+                message: (intl.formatMessage({
                   id: 'header.datasource-manage.connection-name.require',
                 })+" (No more than 15 character)"),
               },
@@ -99,7 +99,7 @@ const { done, visible, current, onDone, onSubmit, children, isReadonly, doneResu
               {
                 required: true,
                 max: 64,
-                message: (useIntl().formatMessage({
+                message: (intl.formatMessage({
                   id: 'header.datasource-manage.ip.require',
                 })+" (No more than 64 character)"),
               },
@@ -145,7 +145,7 @@ const { done, visible, current, onDone, onSubmit, children, isReadonly, doneResu
               {
                 required: true,
                 max: 20,
-                message: (useIntl().formatMessage({
+                message: (intl.formatMessage({
                   id: 'header.datasource-manage.username.require',
                 })+" (No more than 20 character)"),
               },

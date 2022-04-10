@@ -71,6 +71,21 @@ export async function currentUserUsingPOST(
   });
 }
 
+/** deleteAccount POST /api/deleteAccount */
+export async function deleteAccountUsingPOST(
+  params: {
+    // path
+  },
+  options?: { [key: string]: any },
+) {
+  const { ...queryParams } = params;
+  return request<API.BaseVOJSONObject_>('/api/deleteAccount', {
+    method: 'POST',
+    params: { ...queryParams },
+    ...(options || {}),
+  });
+}
+
 /** /api/login/account /api/login/account GET /api/login/account */
 export async function loginAccountUsingGET(
   params: {
@@ -123,7 +138,7 @@ export async function outLoginUsingGET(
   options?: { [key: string]: any },
 ) {
   const { ...queryParams } = params;
-  return request<Record<string, any>>('/api/outLogin', {
+  return request<API.BaseVOJSONObject_>('/api/outLogin', {
     method: 'GET',
     params: { ...queryParams },
     ...(options || {}),
@@ -138,7 +153,7 @@ export async function outLoginUsingPOST(
   options?: { [key: string]: any },
 ) {
   const { ...queryParams } = params;
-  return request<Record<string, any>>('/api/outLogin', {
+  return request<API.BaseVOJSONObject_>('/api/outLogin', {
     method: 'POST',
     params: { ...queryParams },
     ...(options || {}),

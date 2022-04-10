@@ -37,10 +37,8 @@ const GlobalHeaderRight = () => {
     temp.onclose = function (ev) {
     }
     temp.onmessage = function (me) {
-      console.log(me.data);
       try{
         const json = JSON.parse(me.data || '{}');
-        console.log(json);
         const key = json.key;
         let btn;
           if(json.type=='EXPORT_START' || json.type=='EXPORT_ONGOING'){
@@ -73,11 +71,12 @@ const GlobalHeaderRight = () => {
         console.log(ev);
     }
     setWs(temp);
+    const desp = intl.formatMessage({
+      id: 'header.datasource-manage.select-a-connection',
+    });
     setInitialState({ ...initialState, activeConnection: {id:id, alias:alias, host:host, port:port,
       username:username}, activeConnectionDesc: (username==null&&host==null&&port==null)?
-      useIntl().formatMessage({
-        id: 'header.datasource-manage.select-a-connection',
-      }):username+'@'+host+':'+port});
+      desp:(username+'@'+host+':'+port)});
   });
 
 
@@ -127,7 +126,7 @@ const GlobalHeaderRight = () => {
       >
         <ProFormText
           width="md"
-          label={useIntl().formatMessage({
+          label={intl.formatMessage({
             id: 'header.datasource-manage.connection-name',
           })}
           name="alias"
@@ -135,12 +134,12 @@ const GlobalHeaderRight = () => {
             {
               required: true,
               max: 15,
-              message: (useIntl().formatMessage({
+              message: (intl.formatMessage({
                 id: 'header.datasource-manage.connection-name.require',
               })+" (No more than 15 character)"),
             },
           ]}
-          placeholder={useIntl().formatMessage({
+          placeholder={intl.formatMessage({
             id: 'header.datasource-manage.connection-name.require',
           })}
           width="md"
@@ -149,7 +148,7 @@ const GlobalHeaderRight = () => {
 
           <ProFormText
             width="md"
-            label={useIntl().formatMessage({
+            label={intl.formatMessage({
               id: 'header.datasource-manage.ip',
             })}
             name="ip"
@@ -157,18 +156,18 @@ const GlobalHeaderRight = () => {
               {
                 required: true,
                 max: 64,
-                message: (useIntl().formatMessage({
+                message: (intl.formatMessage({
                   id: 'header.datasource-manage.ip.require',
                 })+" (No more than 64 character)"),
               },
             ]}
-            placeholder={useIntl().formatMessage({
+            placeholder={intl.formatMessage({
               id: 'header.datasource-manage.ip.require',
             })}
           />
 
           <ProFormDigit
-            label={useIntl().formatMessage({
+            label={intl.formatMessage({
               id: 'header.datasource-manage.port',
             })}
             name="port"
@@ -182,7 +181,7 @@ const GlobalHeaderRight = () => {
             rules={[
               {
                 required: true,
-                message: (useIntl().formatMessage({
+                message: (intl.formatMessage({
                   id: 'header.datasource-manage.port.require',
                 })),
               },
@@ -190,18 +189,18 @@ const GlobalHeaderRight = () => {
           />
           <ProFormText
             width="md"
-            label={useIntl().formatMessage({
+            label={intl.formatMessage({
               id: 'header.datasource-manage.username',
             })}
             name="connectionUsername"
-            placeholder={useIntl().formatMessage({
+            placeholder={intl.formatMessage({
               id: 'header.datasource-manage.username.require',
             })}
             rules={[
               {
                 required: true,
                 max: 20,
-                message: (useIntl().formatMessage({
+                message: (intl.formatMessage({
                   id: 'header.datasource-manage.username.require',
                 })+" (No more than 20 character)"),
               },
@@ -209,7 +208,7 @@ const GlobalHeaderRight = () => {
           />
           <ProFormText.Password
             width="md"
-            label={useIntl().formatMessage({
+            label={intl.formatMessage({
               id: 'header.datasource-manage.password',
             })}
 
@@ -217,14 +216,14 @@ const GlobalHeaderRight = () => {
             fieldProps={{
               visibilityToggle: false,
             }}
-            placeholder={useIntl().formatMessage({
+            placeholder={intl.formatMessage({
               id: 'header.datasource-manage.password.require',
             })}
             rules={[
               {
                 required: true,
                 max: 20,
-                message: (useIntl().formatMessage({
+                message: (intl.formatMessage({
                   id: 'header.datasource-manage.password.require',
                 })+" (No more than 20 character)"),
               },
@@ -232,10 +231,10 @@ const GlobalHeaderRight = () => {
           />
           <ProFormFieldSet
             name="testConnect"
-            tooltip={useIntl().formatMessage({
+            tooltip={intl.formatMessage({
               id: 'header.datasource-manage.test-connect-tooltip',
             })}
-            label={useIntl().formatMessage({
+            label={intl.formatMessage({
               id: 'header.datasource-manage.test-connect',
             })}
           >
@@ -258,7 +257,7 @@ const GlobalHeaderRight = () => {
                 }
               }}
             >
-              {useIntl().formatMessage({
+              {intl.formatMessage({
                 id: 'header.datasource-manage.test',
               })}
             </Button>
