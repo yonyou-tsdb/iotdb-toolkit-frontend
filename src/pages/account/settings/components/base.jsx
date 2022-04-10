@@ -14,6 +14,7 @@ import md5 from 'js-md5';
 import styles from './BaseView.less';
 
 const BaseView = () => {
+  const intl = useIntl();
   const { initialState, setInitialState } = useModel('@@initialState');
   const { currentUser } = initialState;
   const [form] = Form.useForm();
@@ -24,7 +25,7 @@ const BaseView = () => {
        password: encodePassword});
     if(ret.code=='0'){
      notification.success({
-       message: '密码修改成功',
+       message: intl.formatMessage({id: 'account.setting.password.success',}),
      });
     }else{
      notification.error({
@@ -36,7 +37,9 @@ const BaseView = () => {
     const promise = Promise;
 
     if (value && value !== form.getFieldValue('password')) {
-      return promise.reject('两次输入的密码不匹配!');
+      return promise.reject(intl.formatMessage({
+        id: 'account.setting.password.confirm.error',
+      }));
     }
 
     return promise.resolve();
@@ -53,18 +56,15 @@ const BaseView = () => {
               submitter={{
                 resetButtonProps: {
                   style: {
-                    display: 'none',
+                    display: '',
                   },
-                },
-                submitButtonProps: {
-                  children: '更新基本信息',
                 },
               }}
               initialValues={{ ...currentUser }}
               hideRequiredMark
             >
             <ProFormText.Password
-              label="原密码"
+              label={intl.formatMessage({id: 'account.setting.password.old',})}
               name="passwordOrigin"
               initialValue=" "
               fieldProps={{
@@ -73,7 +73,7 @@ const BaseView = () => {
               rules={[
                 {
                   pattern: /((?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{8,16})/,
-                  message: '请输入至少8位包含数字和大小写字母的密码',
+                  message: intl.formatMessage({id: 'account.setting.password.rule',}),
                 },
                 {
                   max: 16,
@@ -83,7 +83,7 @@ const BaseView = () => {
             >
             </ProFormText.Password>
               <ProFormText.Password
-                label="新密码"
+                label={intl.formatMessage({id: 'account.setting.password.new',})}
                 name="password"
                 initialValue=" "
                 fieldProps={{
@@ -92,7 +92,7 @@ const BaseView = () => {
                 rules={[
                   {
                     pattern: /((?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{8,16})/,
-                    message: '请输入至少8位包含数字和大小写字母的密码',
+                    message: intl.formatMessage({id: 'account.setting.password.rule',}),
                   },
                   {
                     max: 16,
@@ -102,7 +102,7 @@ const BaseView = () => {
               >
               </ProFormText.Password>
             <ProFormText.Password
-              label="密码确认"
+              label={intl.formatMessage({id: 'account.setting.password.confirm',})}
               name="confirm"
               fieldProps={{
                 visibilityToggle: false,

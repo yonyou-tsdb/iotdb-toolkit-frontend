@@ -4,12 +4,14 @@ import { Menu } from 'antd';
 import BaseView from './components/base';
 import SecurityView from './components/security';
 import styles from './style.less';
+import { Link, useRequest, history, useIntl } from 'umi';
 const { Item } = Menu;
 
 const Settings = () => {
+  const intl = useIntl();
   const menuMap = {
-    base: '修改密码',
-    security: '安全设置',
+    base: intl.formatMessage({id: 'account.setting.password',}),
+    security: intl.formatMessage({id: 'account.setting.security',}),
   };
   const [initConfig, setInitConfig] = useState({
     mode: 'inline',

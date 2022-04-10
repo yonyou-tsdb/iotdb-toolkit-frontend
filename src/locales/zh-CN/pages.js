@@ -22,6 +22,7 @@ export default {
   'pages.login.phoneNumber.required': '手机号是必填项',
   'pages.login.phoneNumber.invalid': '不合法的手机号',
   'pages.login.captcha.placeholder': '请输入验证码',
+  'pages.login.captcha.rule': '验证码1分钟内有效，点击可刷新',
   'pages.login.captcha.required': '验证码是必填项',
   'pages.login.phoneLogin.getVerificationCode': '获取验证码',
   'pages.getCaptchaSecondText': '秒后重新获取',

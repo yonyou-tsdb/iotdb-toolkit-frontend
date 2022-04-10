@@ -126,13 +126,19 @@ const Login = () => {
   const checkToken = (_, value) => {
     const promise = Promise;
     if (value == null) {
-      return promise.reject('请输入验证码');
+      return promise.reject(intl.formatMessage({
+        id: 'pages.login.captcha.placeholder',
+      }));
     }
     if (value.length > 20) {
-      return promise.reject('验证码过长');
+      return promise.reject(intl.formatMessage({
+        id: 'account.captcha.tooLong',
+      }));
     }
     if (token == null) {
-      return promise.reject('点击获取验证码');
+      return promise.reject(intl.formatMessage({
+        id: 'account.captcha.get',
+      }));
     }
 
     return promise.resolve();
@@ -303,7 +309,9 @@ const Login = () => {
                     prefix: <EditOutlined className={styles.prefixIcon} />,
                   }}
                   name="captcha"
-                  placeholder='请输入验证码'
+                  placeholder={intl.formatMessage({
+                    id: 'pages.login.captcha.placeholder',
+                  })}
                   rules={[
                     {
                       validator: checkToken,
@@ -314,7 +322,9 @@ const Login = () => {
                 </Col>
                 <Col span={8}>
                 <img
-                  title={'点击刷新验证码'}
+                  title={intl.formatMessage({
+                    id: 'pages.login.captcha.rule',
+                  })}
                   src={type === 'reset'?captchaUrl:defaultCaptchaImg}
                   style={{float: 'right',  cursor: 'pointer', width: 108, height: 39}}
                   onClick={()=>{changeCaptcha()}}

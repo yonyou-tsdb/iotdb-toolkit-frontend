@@ -11,28 +11,6 @@ import md5 from 'js-md5';
 const FormItem = Form.Item;
 const { Option } = Select;
 const InputGroup = Input.Group;
-const passwordStatusMap = {
-  ok: (
-    <div className={styles.success}>
-      <span>强度：强</span>
-    </div>
-  ),
-  pass: (
-    <div className={styles.warning}>
-      <span>强度：中</span>
-    </div>
-  ),
-  poor: (
-    <div className={styles.error}>
-      <span>强度：太短</span>
-    </div>
-  ),
-};
-const passwordProgressMap = {
-  ok: 'success',
-  pass: 'normal',
-  poor: 'exception',
-};
 
 const Register = () => {
   const intl = useIntl();
@@ -61,20 +39,6 @@ const Register = () => {
     [interval],
   );
 
-  const getPasswordStatus = () => {
-    const value = form.getFieldValue('password');
-
-    if (value && value.length > 9) {
-      return 'ok';
-    }
-
-    if (value && value.length > 5) {
-      return 'pass';
-    }
-
-    return 'poor';
-  };
-
   const onFinish = async (values) => {
     setSubmitting(true);
     changeCaptchaToDefault();
@@ -84,7 +48,9 @@ const Register = () => {
     let ret = await registerUsingPOST({...values, token: tokenRefCurrent});
     if(ret.code=='0'){
       notification.success({
-        message: '注册邮件已经发送至邮箱中，请您于24小时内激活账号',
+        message: intl.formatMessage({
+          id: 'account.register.emailNotice',
+        }),
       });
     }else{
       notification.error({
@@ -98,7 +64,9 @@ const Register = () => {
     const promise = Promise;
 
     if (value && value !== form.getFieldValue('password')) {
-      return promise.reject('两次输入的密码不匹配!');
+      return promise.reject(intl.formatMessage({
+        id: 'account.setting.password.confirm.error',
+      }));
     }
 
     return promise.resolve();
@@ -107,13 +75,19 @@ const Register = () => {
   const checkToken = (_, value) => {
     const promise = Promise;
     if (value == null) {
-      return promise.reject('请输入验证码');
+      return promise.reject(intl.formatMessage({
+        id: 'pages.login.captcha.placeholder',
+      }));
     }
     if (value.length > 20) {
-      return promise.reject('验证码过长');
+      return promise.reject(intl.formatMessage({
+        id: 'account.captcha.tooLong',
+      }));
     }
     if (token == null) {
-      return promise.reject('点击获取验证码');
+      return promise.reject(intl.formatMessage({
+        id: 'account.captcha.get',
+      }));
     }
 
     return promise.resolve();
@@ -134,14 +108,14 @@ const Register = () => {
 
   return (
     <div className={styles.main}>
-      <h3>注册</h3>
+      <h3>{intl.formatMessage({id: 'pages.login.registerAccount',})}</h3>
       <ProForm form={form} name="UserRegister" onFinish={onFinish}
       submitter={{
         render: (_, dom) => {},
       }}
       >
         <ProFormText
-          label="账号"
+          label={intl.formatMessage({id: 'account.account.text',})}
           name="username"
           fieldProps={{
           }}
@@ -159,7 +133,7 @@ const Register = () => {
         >
         </ProFormText>
         <ProFormText
-          label="邮箱"
+          label={intl.formatMessage({id: 'account.email.text',})}
           name="mail"
           rules={[
             {
@@ -167,18 +141,16 @@ const Register = () => {
             },
             {
               required: true,
-              message: '请输入邮箱地址',
             },
             {
               type: 'email',
-              message: '邮箱地址格式错误',
             },
           ]}
         >
         </ProFormText>
 
           <ProFormText.Password
-            label="密码"
+            label={intl.formatMessage({id: 'account.password.text',})}
             name="password"
             className={
               form.getFieldValue('password') &&
@@ -191,7 +163,7 @@ const Register = () => {
             rules={[
               {
                 pattern: /((?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{8,16})/,
-                message: '请输入至少8位包含数字和大小写字母的密码',
+                message: intl.formatMessage({id: 'account.setting.password.rule',}),
               },
               {
                 max: 16,
@@ -201,7 +173,7 @@ const Register = () => {
           >
           </ProFormText.Password>
         <ProFormText.Password
-          label="密码确认"
+          label={intl.formatMessage({id: 'account.setting.password.confirm',})}
           name="confirm"
           fieldProps={{
             visibilityToggle: false,
@@ -221,7 +193,9 @@ const Register = () => {
           <Col span={16}>
             <ProFormText
               name="captcha"
-              placeholder='请输入验证码'
+              placeholder={intl.formatMessage({
+                id: 'pages.login.captcha.placeholder',
+              })}
               rules={[
                 {
                   validator: checkToken,
@@ -232,7 +206,9 @@ const Register = () => {
           </Col>
           <Col span={8}>
             <img
-                  title={'点击刷新验证码'}
+                  title={intl.formatMessage({
+                    id: 'pages.login.captcha.rule',
+                  })}
                   src={captchaUrl}
                   style={{float: 'right',  cursor: 'pointer', width: 118, height: 30}}
                   onClick={()=>{changeCaptcha()}}
@@ -248,10 +224,10 @@ const Register = () => {
             htmlType="submit"
 
           >
-            <span>注册</span>
+            <span>{intl.formatMessage({id: 'pages.login.registerAccount',})}</span>
           </Button>
           <Link className={styles.login} to="/user/login">
-            <span>使用已有账户登录</span>
+            <span>{intl.formatMessage({id: 'account.login.back',})}</span>
           </Link>
         </FormItem>
       </ProForm>

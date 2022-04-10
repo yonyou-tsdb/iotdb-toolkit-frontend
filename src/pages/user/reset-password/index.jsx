@@ -9,30 +9,6 @@ import defaultCaptchaImg from '../../../assets/captcha-pure.png';
 import { v4 as uuid } from 'uuid';
 import md5 from 'js-md5';
 const FormItem = Form.Item;
-const { Option } = Select;
-const InputGroup = Input.Group;
-const passwordStatusMap = {
-  ok: (
-    <div className={styles.success}>
-      <span>强度：强</span>
-    </div>
-  ),
-  pass: (
-    <div className={styles.warning}>
-      <span>强度：中</span>
-    </div>
-  ),
-  poor: (
-    <div className={styles.error}>
-      <span>强度：太短</span>
-    </div>
-  ),
-};
-const passwordProgressMap = {
-  ok: 'success',
-  pass: 'normal',
-  poor: 'exception',
-};
 
 const ResetPassword = ({ location }) => {
   const username = location.query.username;
@@ -54,27 +30,13 @@ const ResetPassword = ({ location }) => {
     [interval],
   );
 
-  const getPasswordStatus = () => {
-    const value = form.getFieldValue('password');
-
-    if (value && value.length > 9) {
-      return 'ok';
-    }
-
-    if (value && value.length > 5) {
-      return 'pass';
-    }
-
-    return 'poor';
-  };
-
   const onFinish = async (values) => {
     setSubmitting(true);
     values.password = md5(values.password);
     let ret = await resetUpdatePasswordUsingPOST({password:values.password, id:id, token:token});
     if(ret.code=='0'){
       notification.success({
-        message: '密码修改成功',
+        message: intl.formatMessage({id: 'account.setting.password.success',}),
       });
     }else{
       notification.error({
@@ -88,7 +50,9 @@ const ResetPassword = ({ location }) => {
     const promise = Promise;
 
     if (value && value !== form.getFieldValue('password')) {
-      return promise.reject('两次输入的密码不匹配!');
+      return promise.reject(intl.formatMessage({
+        id: 'account.setting.password.confirm.error',
+      }));
     }
 
     return promise.resolve();
@@ -96,14 +60,14 @@ const ResetPassword = ({ location }) => {
 
   return (
     <div className={styles.main}>
-      <h3>修改密码</h3>
+      <h3>{intl.formatMessage({id: 'account.setting.password',})}</h3>
       <ProForm form={form} name="UpdatePassword" onFinish={onFinish}
       submitter={{
         render: (_, dom) => {},
       }}
       >
         <ProFormText
-          label="账号"
+          label={intl.formatMessage({id: 'account.account.text',})}
           fieldProps={{
             readOnly: 'readOnly',
             value: username,
@@ -123,7 +87,7 @@ const ResetPassword = ({ location }) => {
         </ProFormText>
 
           <ProFormText.Password
-            label="密码"
+            label={intl.formatMessage({id: 'account.password.text',})}
             name="password"
             className={
               form.getFieldValue('password') &&
@@ -136,7 +100,7 @@ const ResetPassword = ({ location }) => {
             rules={[
               {
                 pattern: /((?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{8,16})/,
-                message: '请输入至少8位包含数字和大小写字母的密码',
+                message: intl.formatMessage({id: 'account.setting.password.rule',}),
               },
               {
                 max: 16,
@@ -146,7 +110,7 @@ const ResetPassword = ({ location }) => {
           >
           </ProFormText.Password>
         <ProFormText.Password
-          label="密码确认"
+          label={intl.formatMessage({id: 'account.setting.password.confirm',})}
           name="confirm"
           fieldProps={{
             visibilityToggle: false,
@@ -171,10 +135,10 @@ const ResetPassword = ({ location }) => {
             htmlType="submit"
 
           >
-            <span>提交</span>
+            <span>{intl.formatMessage({id: 'account.setting.password',})}</span>
           </Button>
           <Link className={styles.login} to="/user/login">
-            <span>返回登录页面</span>
+            <span>{intl.formatMessage({id: 'account.login.back',})}</span>
           </Link>
         </FormItem>
       </ProForm>
