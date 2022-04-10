@@ -580,7 +580,13 @@ const Self = () => {
         }
         return (
           <Fragment >
-            <Tooltip title={intl.formatMessage({id: 'query.sql.tooltip',})}>
+            <Tooltip title={<span>
+              {intl.formatMessage({id: 'query.sql.tooltip1',})}<br/>
+              {intl.formatMessage({id: 'query.sql.tooltip2',})}<br/>
+              {intl.formatMessage({id: 'query.sql.tooltip3',})}<br/>
+              {intl.formatMessage({id: 'query.sql.tooltip4',})}<br/>
+              {intl.formatMessage({id: 'query.sql.tooltip5',})}
+            </span>}>
               <QuestionCircleOutlined />
             </Tooltip>
             <ButtonGroup>
