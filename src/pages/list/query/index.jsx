@@ -34,7 +34,6 @@ const Self = () => {
   const intl = useIntl();
   const { initialState, setInitialState } = useModel('@@initialState');
   const [querySql, setQuerySql] = useState({'query1':'SHOW STORAGE GROUP'});
-  const [querySqlReal, setQuerySqlReal] = useState({'query1':'SHOW STORAGE GROUP'});
   const [activeQueryTabkey, setActiveQueryTabkey] = useState('query1');
   const activeQueryTabkeyRef = useRef('query1');
   useEffect(() => {
@@ -84,12 +83,6 @@ const Self = () => {
           editor.showHint();
         }
         querySql[activeQueryTabkey]=value;
-        querySqlReal[activeQueryTabkey]=value;
-      }}
-      onCursorActivity={(codeMirror) => {
-        if(codeMirror.getSelection()!=null && codeMirror.getSelection()!=''){
-          querySqlReal[activeQueryTabkeyRef.current]=codeMirror.getSelection();
-        }
       }}
     />
   );
@@ -413,8 +406,8 @@ const Self = () => {
       queryToken[activeQueryTabkey]=token;
       setQueryToken({...queryToken});
     }
-    let sql = querySqlReal[activeQueryTabkeyRef.current];
-    querySqlReal[activeQueryTabkeyRef.current]=querySql[activeQueryTabkeyRef.current];
+    let sql = querySql[activeQueryTabkeyRef.current];
+    querySql[activeQueryTabkeyRef.current]=querySql[activeQueryTabkeyRef.current];
     let tabToken = uuid().replaceAll('-','');
     queryTabTokens[activeQueryTabkeyRef.current] = tabToken;
     setQueryTabTokens({...queryTabTokens});
@@ -584,8 +577,7 @@ const Self = () => {
               {intl.formatMessage({id: 'query.sql.tooltip1',})}<br/>
               {intl.formatMessage({id: 'query.sql.tooltip2',})}<br/>
               {intl.formatMessage({id: 'query.sql.tooltip3',})}<br/>
-              {intl.formatMessage({id: 'query.sql.tooltip4',})}<br/>
-              {intl.formatMessage({id: 'query.sql.tooltip5',})}
+              {intl.formatMessage({id: 'query.sql.tooltip4',})}
             </span>}>
               <QuestionCircleOutlined />
             </Tooltip>
