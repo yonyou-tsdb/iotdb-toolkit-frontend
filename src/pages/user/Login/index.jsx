@@ -49,7 +49,11 @@ const Login = () => {
     }
   };
   const goto = () => {
-    window.location = window.location.protocol + '//' + window.location.host + '/list/connection-list';
+    // window.location = window.location.protocol + '//' + window.location.host + '/list/connection-list';
+    if(!location.pathname.endsWith('/')){
+      history.push('/user/login');
+    }
+    history.push('/list/connection-list');
   };
   const selectConnection = (item) => {
     const jsessionid = getItem('JSESSIONID');
