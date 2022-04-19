@@ -1,4 +1,5 @@
 export default {
+  'app.settings.version.is': 'Version:',
   'app.settings.menuMap.basic': 'Basic Settings',
   'app.settings.menuMap.security': 'Security Settings',
   'app.settings.menuMap.binding': 'Account Binding',

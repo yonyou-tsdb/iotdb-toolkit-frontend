@@ -357,6 +357,12 @@ const Login = () => {
             <a href="https://iotdb.apache.org/zh/" target="_blank"><ReadOutlined className={styles.icon} /></a>
             <a href="https://github.com/apache/iotdb" target="_blank"><GithubOutlined className={styles.icon} /></a>
           </Space>
+          <Space className={styles.other} style={{
+            float: 'right',
+          }}>
+            <FormattedMessage id='app.settings.version.is' />
+            0.12.4-1
+          </Space>
         </div>
       </div>
       <Footer />
