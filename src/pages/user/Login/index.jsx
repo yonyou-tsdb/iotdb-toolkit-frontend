@@ -49,11 +49,9 @@ const Login = () => {
     }
   };
   const goto = () => {
-    // window.location = window.location.protocol + '//' + window.location.host + '/list/connection-list';
-    if(!location.pathname.endsWith('/')){
-      history.push('/user/login');
-    }
-    history.push('/list/connection-list');
+    setTimeout(() => {
+      history.push('/list/connection-list');
+    }, 10);
   };
   const selectConnection = (item) => {
     const jsessionid = getItem('JSESSIONID');
@@ -361,7 +359,7 @@ const Login = () => {
             float: 'right',
           }}>
             <FormattedMessage id='app.settings.version.is' />
-            0.12.4-1
+            0.12.4
           </Space>
         </div>
       </div>
