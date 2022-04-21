@@ -6,10 +6,11 @@ import Footer from '@/components/Footer';
 import { currentUserUsingPOST as queryCurrentUser } from '@/services/swagger1/userController';
 import { connectionLessUsingPOST, } from '@/services/swagger1/connectionController';
 import { BookOutlined, LinkOutlined } from '@ant-design/icons';
+import { parse, stringify } from 'qs';
 const isDev = process.env.NODE_ENV === 'development';
-const loginPath = '/user/login';
-const anonPath = [loginPath, '/user/register', '/user/success', '/user/fail',
- '/user/reset-password'];
+const loginPath = '/user/login/';
+const anonPath = ['/user/login'];
+const anonPath2 = ['/user/success', '/user/fail', '/user/reset-password', '/user/register'];
 /** 获取用户信息比较慢的时候会展示一个 loading */
 
 export const initialStateConfig = {
@@ -120,7 +121,14 @@ export const layout = ({ initialState }) => {
       let pathname = location.pathname.endsWith('/') ?
        location.pathname.substring(0, location.pathname.length - 1):
        location.pathname;
-      if (initialState?.currentUser?.name == null
+      if(anonPath2.indexOf(pathname) >= 0){
+        return;
+      }
+      let name = initialState?.currentUser?.name;
+      if(name!=null){
+        return;
+      }
+      if (name == null
           && anonPath.indexOf(pathname) < 0
         ) {
         history.push(loginPath);

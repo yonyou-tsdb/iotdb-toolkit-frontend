@@ -4,7 +4,7 @@ import React from 'react';
 import styles from './style.less';
 const actions = (
   <div className={styles.actions}>
-    <Link to="/user/login">
+    <Link to="/user/login/">
       <Button size="large">返回首页</Button>
     </Link>
   </div>

@@ -137,7 +137,7 @@ const ResetPassword = ({ location }) => {
           >
             <span>{intl.formatMessage({id: 'account.setting.password',})}</span>
           </Button>
-          <Link className={styles.login} to="/user/login">
+          <Link className={styles.login} to="/user/login/">
             <span>{intl.formatMessage({id: 'account.login.back',})}</span>
           </Link>
         </FormItem>

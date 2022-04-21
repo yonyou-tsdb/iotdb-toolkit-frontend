@@ -14,7 +14,7 @@ const loginOut = async () => {
   await outLogin();
   const { query = {}, pathname } = history.location;
   history.push({
-    pathname: '/user/login',
+    pathname: '/user/login/',
   });
 };
 const AvatarDropdown = ({ menu }) => {
@@ -30,7 +30,7 @@ const AvatarDropdown = ({ menu }) => {
       loginOut();
       return;
     }else if(key === 'setting' && initialState){
-      history.push('/account/settings');
+      history.push('/account/settings/');
     }
   }
   const loading = (

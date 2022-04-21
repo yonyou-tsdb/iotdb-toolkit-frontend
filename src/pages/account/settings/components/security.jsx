@@ -35,7 +35,7 @@ const SecurityView = () => {
         intl.formatMessage({id: 'account.setting.security.deleteAccount.success',}),
       });
       history.push({
-        pathname: '/user/login',
+        pathname: '/user/login/',
       });
     }else{
       notification.error({

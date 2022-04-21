@@ -50,7 +50,7 @@ const Login = () => {
   };
   const goto = () => {
     setTimeout(() => {
-      history.push('/list/connection-list');
+      history.push('/list/connection-list/');
     }, 10);
   };
   const selectConnection = (item) => {
@@ -120,9 +120,8 @@ const Login = () => {
   const changeCaptcha = () => {
     let tabToken = uuid().replaceAll('-','');
     setToken(tabToken);
-    setCaptchaUrl(location.pathname.endsWith('/')?
-      '../../api/acquireCaptcha?token='+tabToken:
-      '../api/acquireCaptcha?token='+tabToken
+    setCaptchaUrl(
+      '../../api/acquireCaptcha?token='+tabToken
     );
   }
   const checkToken = (_, value) => {
@@ -343,7 +342,7 @@ const Login = () => {
               <Checkbox danger defaultChecked={true} noStyle name="autoLogin">
                 <FormattedMessage id="pages.login.rememberMe" defaultMessage="自动登录" />
               </Checkbox>
-              <Link to='/user/register' style={{
+              <Link to='/user/register/' style={{
                 float: 'right',
               }}>
                 <FormattedMessage id='pages.login.registerAccount' defaultMessage="注册账号" />

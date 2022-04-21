@@ -37,7 +37,7 @@ export default defineConfig({
       layout: false,
       routes: [
         {
-          path: '/user/login',
+          path: '/user/login/',
           layout: false,
           name: 'login',
           component: './User/Login',
@@ -57,7 +57,7 @@ export default defineConfig({
         {
           name: 'register',
           icon: 'smile',
-          path: '/user/register',
+          path: '/user/register/',
           component: './user/register',
         },
         {
@@ -73,7 +73,7 @@ export default defineConfig({
     },
     {
       path: '/',
-      redirect: '/list/connection-list',
+      redirect: '/list/connection-list/',
     },
     {
       path: '/',
@@ -83,66 +83,66 @@ export default defineConfig({
         {
           name: 'connection-list',
           icon: 'smile',
-          path: '/list/connection-list',
+          path: '/list/connection-list/',
           component: './list/connection-list',
         },
         {
           name: 'manage-user',
           icon: 'smile',
-          path: '/list/manage-user',
+          path: '/list/manage-user/',
           component: './list/manage-user',
         },
         {
           name: 'create-storage-group',
           icon: 'smile',
-          path: '/list/manage-storage',
+          path: '/list/manage-storage/',
           component: './list/manage-storage',
         },
         {
           name: 'query',
           icon: 'smile',
-          path: '/list/query',
+          path: '/list/query/',
           component: './list/query',
         },
         {
           name: 'create-entity',
           icon: 'smile',
-          path: '/form/advanced-form2',
+          path: '/form/advanced-form2/',
           component: './form/advanced-form',
           hideInMenu: true,
         },
         {
           name: 'check-device',
           icon: 'smile',
-          path: '/list/table-list',
+          path: '/list/table-list/',
           component: './list/table-list',
           hideInMenu: true,
         },
         {
           name: 'query',
           icon: 'smile',
-          path: '/profile/advanced',
+          path: '/profile/advanced/',
           component: './profile/advanced',
           hideInMenu: true,
         },
         {
           name: 'overview',
           icon: 'smile',
-          path: '/list/basic-list',
+          path: '/list/basic-list/',
           component: './list/basic-list',
           hideInMenu: true,
         },
         {
           name: 'settings',
           icon: 'smile',
-          path: '/account/settings',
+          path: '/account/settings/',
           component: './account/settings',
           hideInMenu: true,
         },
         {
           name: 'autoSkip',
           icon: 'smile',
-          path: '/result/autoSkip',
+          path: '/result/autoSkip/',
           component: './result/autoSkip',
           hideInMenu: true,
         },

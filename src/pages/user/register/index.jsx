@@ -26,8 +26,7 @@ const Register = () => {
     tokenRef.current = token
   }, [token]);
   const [captchaUrl, setCaptchaUrl] = useState(
-    location.pathname.endsWith('/')?
-    '../../api/acquireCaptcha?token='+initToken:'../api/acquireCaptcha?token='+initToken
+    '../../api/acquireCaptcha?token='+initToken
   );
   const confirmDirty = false;
   let interval;
@@ -226,7 +225,7 @@ const Register = () => {
           >
             <span>{intl.formatMessage({id: 'pages.login.registerAccount',})}</span>
           </Button>
-          <Link className={styles.login} to="/user/login">
+          <Link className={styles.login} to="/user/login/">
             <span>{intl.formatMessage({id: 'account.login.back',})}</span>
           </Link>
         </FormItem>
