@@ -6,6 +6,9 @@ import {Badge, Button, Card, Statistic, Descriptions, Divider, Dropdown, Menu, P
 import { GridContent, PageContainer, RouteContext } from '@ant-design/pro-layout';
 import React, { Fragment, useEffect, useState, useRef } from 'react';
 import { useRequest, useModel, useIntl } from 'umi';
+import moment from 'moment';
+import Charts from 'ant-design-pro/lib/Charts';
+const {MiniArea, MiniBar, MiniProgress} = Charts;
 import { queryAdvancedProfile } from './service';
 import { querySqlWithTenantUsingPOST, queryAllUsingPOST,querySaveUsingPOST,
   queryExportCsvWithTenantUsingPOST, querySqlAppendWithTenantUsingPOST, updatePointWithTenantUsingPOST,
@@ -655,6 +658,23 @@ const Self = () => {
     seTabStatus({ tabActiveKey: 'tab'+key, operationKey: 'query'+key });
   };
 
+  const visitData = [{x:moment(parseInt(0)).utc().format('YYYY-MM-DD HH:mm:ss.SSS'),y:0}];
+  const beginDay = new Date().getTime();
+  if(resultData[activeQueryTabkey]!=null){
+    for (let i = 0; i < resultData[activeQueryTabkey].length; i++) {
+      let b = true;
+      Object.keys(resultData[activeQueryTabkey][i]).map((item,index)=>{
+        if(b && item!='index' && item!= 'Time'){
+          b = false;
+          visitData.push({
+            x: moment(parseInt(resultData[activeQueryTabkey][i]['Time'])).utc().format('YYYY-MM-DD HH:mm:ss.SSS'),
+            y: resultData[activeQueryTabkey][i][item],
+          });
+        }
+        return;
+      })
+    }
+  }
   return (
     <PageContainer
       title={initialState.activeConnectionDesc}
@@ -664,10 +684,11 @@ const Self = () => {
       tabList={queryTabList}
       tabActiveKey={activeQueryTabkey}
     >
+
       <div className={styles.main}>
+
         <GridContent>
           <Card
-            id='s'
             className={styles.tabsCard}
             title={
               resultMessage[activeQueryTabkey]
@@ -675,6 +696,7 @@ const Self = () => {
             bordered={false}
           >
             {contentList[tabStatus.operationKey]}
+            <MiniArea line data={visitData} />
           </Card>
         </GridContent>
       </div>

@@ -60,6 +60,7 @@
     "@types/lodash.debounce": "^4.0.6",
     "@umijs/route-utils": "^1.0.36",
     "ahooks": "^2.0.0",
+    "ant-design-pro": "^2.3.2",
     "ant-virtual-table": "^0.1.11",
     "antd": "^4.14.0",
     "bizcharts": "^3.5.3-beta.0",
