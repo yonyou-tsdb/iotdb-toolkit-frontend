@@ -6,9 +6,6 @@ import {Badge, Button, Card, Statistic, Descriptions, Divider, Dropdown, Menu, P
 import { GridContent, PageContainer, RouteContext } from '@ant-design/pro-layout';
 import React, { Fragment, useEffect, useState, useRef } from 'react';
 import { useRequest, useModel, useIntl } from 'umi';
-import moment from 'moment';
-import Charts from 'ant-design-pro/lib/Charts';
-const {MiniArea, MiniBar, MiniProgress} = Charts;
 import { queryAdvancedProfile } from './service';
 import { querySqlWithTenantUsingPOST, queryAllUsingPOST,querySaveUsingPOST,
   queryExportCsvWithTenantUsingPOST, querySqlAppendWithTenantUsingPOST, updatePointWithTenantUsingPOST,
@@ -30,6 +27,7 @@ import '../../../../node_modules/codemirror/addon/hint/sql-hint';
 import '../../../../node_modules/codemirror/addon/comment/comment';
 import { v4 as uuid } from 'uuid';
 import { VList, EditableTable } from '../../../utils/virtual-table';
+import { VisualMiniArea } from '../../../utils/visualization-data';
 import {BetterInputNumber} from '../../../utils/BetterInputNumber';
 import ExportJsonExcel from "js-export-excel";
 const { Option } = Select;
@@ -658,23 +656,6 @@ const Self = () => {
     seTabStatus({ tabActiveKey: 'tab'+key, operationKey: 'query'+key });
   };
 
-  const visitData = [{x:moment(parseInt(0)).utc().format('YYYY-MM-DD HH:mm:ss.SSS'),y:0}];
-  const beginDay = new Date().getTime();
-  if(resultData[activeQueryTabkey]!=null){
-    for (let i = 0; i < resultData[activeQueryTabkey].length; i++) {
-      let b = true;
-      Object.keys(resultData[activeQueryTabkey][i]).map((item,index)=>{
-        if(b && item!='index' && item!= 'Time'){
-          b = false;
-          visitData.push({
-            x: moment(parseInt(resultData[activeQueryTabkey][i]['Time'])).utc().format('YYYY-MM-DD HH:mm:ss.SSS'),
-            y: resultData[activeQueryTabkey][i][item],
-          });
-        }
-        return;
-      })
-    }
-  }
   return (
     <PageContainer
       title={initialState.activeConnectionDesc}
@@ -696,7 +677,7 @@ const Self = () => {
             bordered={false}
           >
             {contentList[tabStatus.operationKey]}
-            <MiniArea line data={visitData} />
+            <VisualMiniArea line data={resultData[activeQueryTabkey]} />
           </Card>
         </GridContent>
       </div>
