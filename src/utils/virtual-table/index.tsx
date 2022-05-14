@@ -465,30 +465,6 @@ const BuildEditableTable = (props) => {
   const cancel = () => {
     clearEditable();
   };
-  const saveNoUse = async (record) => {
-    try {
-      const row = (await form.validateFields()) ;
-      const newData = [...data[active]];
-      const index = newData.findIndex(item => record[rowKey] === item[rowKey]);
-      if (index > -1) {
-        const item = newData[index];
-        newData.splice(index, 1, {
-          ...item,
-          ...row,
-        });
-        data[active] = newData;
-        setData({...data});
-      }
-       else {
-        newData.push(row);
-        data[active] = newData;
-        setData({...data});
-      }
-    } catch (errInfo) {
-      console.log('Validate Failed:', errInfo);
-    }
-    clearEditable();
-  };
 
     const mergedColumns = columns.map(col => {
       if (!col.editable) {

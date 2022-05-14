@@ -1,55 +1,53 @@
 import Charts from 'ant-design-pro/lib/Charts';
-const {MiniArea, MiniBar, MiniProgress} = Charts;
+const {ChartCard, MiniArea, MiniBar, MiniProgress, Bar} = Charts;
+import NumberInfo from 'ant-design-pro/lib/NumberInfo';
+import {CloseCircleOutlined} from '@ant-design/icons';
 import moment from 'moment';
 const BuildVisualizationData = (props) => {
 
 }
 
 export const VisualMiniArea = (props: {}) => {
-  const { data, line } = props;
-  // alert(line)
+  const { name, data, line, resultGraphicalColumn, setResultGraphicalColumn, activeQueryTabkey } = props;
   const visitData = [{x:moment(parseInt(0)).utc().format('YYYY-MM-DD HH:mm:ss.SSS'),y:0}];
   const beginDay = new Date().getTime();
   const limit = 1000;
-  if(data!=null && data.length>0){
-    if (data.length < 1000){
-      for (let i = 0; i < data.length; i++) {
-        let b = true;
+  if(data!=null && data.length>0 && name != null){
+    let segment = limit / data.length;
+    let totalSegment = 0.0;
+    for (let i = 0; i < data.length; i++) {
+      totalSegment += segment;
+      let b = true;
+      if(totalSegment >= 1){
+        totalSegment -= 1;
         Object.keys(data[i]).map((item,index)=>{
-          if(b && item!='index' && item!= 'Time'){
+          if(b){
             b = false;
             visitData.push({
               x: moment(parseInt(data[i]['Time'])).utc().format('YYYY-MM-DD HH:mm:ss.SSS'),
-              y: data[i][item],
+              y: data[i][name],
             });
           }
           return;
         })
       }
-    }else
-    {
-      let segment = limit / data.length;
-      let totalSegment = 0.0;
-      for (let i = 0; i < data.length; i++) {
-        totalSegment += segment;
-        let b = true;
-        if(totalSegment >= 1){
-          totalSegment -= 1;
-          Object.keys(data[i]).map((item,index)=>{
-            if(b && item!='index' && item!= 'Time'){
-              b = false;
-              visitData.push({
-                x: moment(parseInt(data[i]['Time'])).utc().format('YYYY-MM-DD HH:mm:ss.SSS'),
-                y: data[i][item],
-              });
-            }
-            return;
-          })
-        }
-      }
     }
   }
-  return <MiniArea line={line} data={visitData} />;
+  return <ChartCard title={<><b>{name}</b> <CloseCircleOutlined
+  style={{cursor: 'pointer'}} title='close' onClick={()=>{
+    resultGraphicalColumn[activeQueryTabkey]=null;
+    setResultGraphicalColumn({...resultGraphicalColumn});
+  }} /></>} contentHeight={250} >
+  <NumberInfo subTitle={<>total : {data.length}  sampling : {visitData.length-1}</>} />
+  <MiniArea line={line} data={visitData} height={200}  yAxis= {{
+      grid: {
+        line: {
+          style: {
+            stroke: '#000a3b',
+          },
+        },
+      },
+    }}/></ChartCard>;
 }
 
 export const VisualMiniBar = (props: {}) => {

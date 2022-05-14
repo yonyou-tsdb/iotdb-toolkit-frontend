@@ -2,7 +2,7 @@ import {MenuOutlined, EllipsisOutlined, InfoCircleOutlined, PlayCircleOutlined,
   SaveOutlined, PauseCircleOutlined, PlusCircleOutlined, CloseCircleOutlined, FileSearchOutlined,
   ExportOutlined, ImportOutlined, SearchOutlined, QuestionCircleOutlined} from '@ant-design/icons';
 import {Badge, Button, Card, Statistic, Descriptions, Divider, Dropdown, Menu, Popover, Table, Tooltip, Empty,
-  notification, Upload, Typography, Form, Input, InputNumber, Popconfirm, Select } from 'antd';
+  notification, Upload, Typography, Form, Input, InputNumber, Popconfirm, Select, Radio } from 'antd';
 import { GridContent, PageContainer, RouteContext } from '@ant-design/pro-layout';
 import React, { Fragment, useEffect, useState, useRef } from 'react';
 import { useRequest, useModel, useIntl } from 'umi';
@@ -114,6 +114,7 @@ const Self = () => {
   const [editingKey, setEditingKey] = useState('');
   const [resultLocatorIndex, setResultLocatorIndex] = useState({});
   const [resultLocatorValue, setResultLocatorValue] = useState([]);
+  const [resultGraphicalColumn, setResultGraphicalColumn] = useState([]);
   const [editableForm] = Form.useForm();
   const resultLocator =
   <>
@@ -396,6 +397,8 @@ const Self = () => {
   const runQuery = async() => {
     clearEditable();
     if(alertQueryTab()){ return; };
+    resultGraphicalColumn[activeQueryTabkey]=null;
+    setResultGraphicalColumn({...resultGraphicalColumn});
     resultMessage[activeQueryTabkey]=null;
     setResultMessage({...resultMessage});
     resultColumn[activeQueryTabkey]=[];
@@ -485,7 +488,10 @@ const Self = () => {
           }
           Object.keys(data[i]).map((item,index)=>{
             if(columnObj[item]==null){
-              columnObj[item] = {title:item
+              columnObj[item] = {
+                title:(item=='Time'||item=='Device')? item:
+                <>{item} <span title='Check to graph this column'><Radio value={item}
+                /></span></>
                 , editable:(item=='Time'||item=='Device')? false: true
                 , dataIndex: item, width:190
                 , key: item,
@@ -630,6 +636,11 @@ const Self = () => {
   };
   for(let i=1;i<100;i++){
     contentList['query'+i]=(
+      <Radio.Group onChange={(e)=>{
+        let v = e.target.value;
+        resultGraphicalColumn[activeQueryTabkey]=v;
+        setResultGraphicalColumn({...resultGraphicalColumn});
+      }} value={resultGraphicalColumn[activeQueryTabkey]}>
       <EditableTable
         rowKey='index'
         loading={loading}
@@ -648,6 +659,7 @@ const Self = () => {
         wrapTableRef={wrapTableRef}
         timeDisplayForm={timeDisplayForm}
       />
+      </Radio.Group>
     );
   }
 
@@ -676,8 +688,13 @@ const Self = () => {
             }
             bordered={false}
           >
+          {resultGraphicalColumn[activeQueryTabkey]==null?null:
+            <VisualMiniArea line
+             data={resultData[activeQueryTabkey]} name={resultGraphicalColumn[activeQueryTabkey]}
+             resultGraphicalColumn={resultGraphicalColumn} setResultGraphicalColumn={setResultGraphicalColumn}
+             activeQueryTabkey={activeQueryTabkey} />
+          }
             {contentList[tabStatus.operationKey]}
-            <VisualMiniArea line data={resultData[activeQueryTabkey]} />
           </Card>
         </GridContent>
       </div>
