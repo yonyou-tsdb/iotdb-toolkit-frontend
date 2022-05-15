@@ -11,7 +11,7 @@ enum dispatchType {
   RENDERTR = 'RENDERTR',
   RESET = 'RESET',
 }
-const initialState = {
+const theInitialState = {
   // 行高度
   rowHeight: 0,
   // 当前的scrollTop
@@ -68,7 +68,7 @@ const ScrollContext: any = createContext({
   renderLen: 1,
   start: 0,
   offsetStart: 0,
-  rowHeight: initialState.rowHeight,
+  rowHeight: theInitialState.rowHeight,
   totalLen: 0,
 })
 
@@ -158,7 +158,7 @@ let wrapTableRef = null;
 const VTable = (props: any): JSX.Element => {
   const { style, children, ...rest } = props
 
-  const [state, dispatch] = useReducer(reducer, initialState)
+  const [state, dispatch] = useReducer(reducer, theInitialState)
   // const wrapTableRef = useRef<HTMLDivElement>(null)
   const tableRef = useRef<HTMLTableElement>(null)
 

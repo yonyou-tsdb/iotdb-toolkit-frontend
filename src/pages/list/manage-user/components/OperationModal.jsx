@@ -21,7 +21,6 @@ const OperationModal = (props) => {
     unsave, pagePrivilegesShowTotal, pagePrivilegesHasMore, pagePrivilegesAppend,
     currentFiltered, setCurrentFiltered, refresh, search, searchContent, setSearchContent,
     onAddDone, } = props;
-  const { initialState, setInitialState } = useModel('@@initialState');
   const authConnectionOptions = ['SET_STORAGE_GROUP','INSERT_TIMESERIES','READ_TIMESERIES','CREATE_TIMESERIES',
 'DELETE_TIMESERIES','CREATE_USER','DELETE_USER','MODIFY_PASSWORD','LIST_USER','GRANT_USER_PRIVILEGE',
 'REVOKE_USER_PRIVILEGE','CREATE_FUNCTION','DROP_FUNCTION','CREATE_TRIGGER','DROP_TRIGGER','START_TRIGGER','STOP_TRIGGER'];

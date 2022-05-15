@@ -35,6 +35,10 @@ const ListContent = ({ data: { createTime, username } }) => (
 
 export const BasicList = () => {
   const intl = useIntl();
+  const [connectList, setConnectList] = useState([]);
+  const [connectListTotalCount, setConnectListTotalCount] = useState(undefined);
+  const [connectListCurrent, setConnectListCurrent] = useState(undefined);
+  const [connectListDefault, setConnectListDefault] = useState(undefined);
   const [done, setDone] = useState(false);
   const [visible, setVisible] = useState(false);
   const [currentItem, setCurrentItem] = useState(undefined);
@@ -58,17 +62,19 @@ export const BasicList = () => {
       pageNum: 1,
       aliasLike: searchContent,
     });
-    setInitialState({ ...initialState, activeConnection: tenant,connectionList_self: ret.data.pageItems,
-      connectionList_self_totalCount: ret.data.totalCount, connectionList_self_current: 1,
-      connectionList_self_default: ret.message, });
+    setInitialState({ ...initialState, activeConnection: tenant,});
+    setConnectList(ret.data.pageItems);
+    setConnectListTotalCount(ret.data.totalCount);
+    setConnectListCurrent(1);
+    setConnectListDefault(ret.message)
   });
   let totalCount = listData?.totalCount || 1;
   let paginationProps = {
     showSizeChanger: false,
     showQuickJumper: true,
     pageSize: 10,
-    current: initialState.connectionList_self_current===undefined?1:initialState.connectionList_self_current,
-    total: initialState.connectionList_self_totalCount===undefined?totalCount:initialState.connectionList_self_totalCount,
+    current: connectListCurrent==undefined?1:connectListCurrent,
+    total: connectListTotalCount==undefined?totalCount:connectListTotalCount,
     onChange:(current, pageSize)=>{
       change(current, pageSize, searchContent);
     },
@@ -80,10 +86,9 @@ export const BasicList = () => {
       pageNum: current,
       aliasLike: aliasLike,
     });
-    setInitialState({ ...initialState, connectionList_self: ret2.data.pageItems,
-      connectionList_self_totalCount: ret2.data.totalCount,
-      connectionList_self_current: current,
-     });
+    setConnectList(ret2.data.pageItems);
+    setConnectListTotalCount(ret2.data.totalCount);
+    setConnectListCurrent(current);
   }
 
   const showEditModal = (item1, isReadonly) => {
@@ -143,10 +148,10 @@ export const BasicList = () => {
   }
 
   const setConnectionDefault = async (key, item) => {
-    if(item.id==initialState.connectionList_self_default){
+    if(item.id==connectListDefault){
       let msg = await connectionUndefaultUsingPOST({connectionId:item.id});
       if(msg.code == '0'){
-        setInitialState({ ...initialState, connectionList_self_default: null, });
+        setConnectListDefault(null);
         notification.success({
           message: item.alias + ' -- ' +
             intl.formatMessage({id: 'pages.connection-list.undefault.success',}),
@@ -155,7 +160,7 @@ export const BasicList = () => {
     }else{
       let msg = await connectionDefaultUsingPOST({connectionId:item.id});
       if(msg.code == '0'){
-        setInitialState({ ...initialState, connectionList_self_default: msg.data, });
+        setConnectListDefault(msg.data);
         notification.success({
           message: item.alias + ' -- ' +
             intl.formatMessage({id: 'pages.connection-list.default.success',}),
@@ -215,7 +220,7 @@ export const BasicList = () => {
             id: 'pages.connection-list.delete',
           })}</Menu.Item>
           <Menu.Item key="default" onClick={({ key }) => setConnectionDefault(key, item)}>{intl.formatMessage({
-            id: item.id==initialState.connectionList_self_default? 'pages.connection-list.undefault':
+            id: item.id==connectListDefault? 'pages.connection-list.undefault':
               'pages.connection-list.default',
           })}</Menu.Item>
         </Menu>
@@ -287,7 +292,7 @@ export const BasicList = () => {
               size="large"
               rowKey="id"
               pagination={paginationProps}
-              dataSource={initialState.connectionList_self}
+              dataSource={connectList}
               renderItem={(item) => (
                 <List.Item
                   actions={[

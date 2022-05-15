@@ -33,6 +33,8 @@ const ListContent = ({ data: { createTime, username } }) => (
 
 export const BasicList = () => {
   const intl = useIntl();
+  const [manageUser, setManageUser] = useState(undefined);
+  const [manageUserCurrent, setManageUserCurrent] = useState(undefined);
   const [done, setDone] = useState(false);
   const [addUserVisible, setAddUserVisible] = useState(false);
   const [editUserVisible, setEditUserVisible] = useState(false);
@@ -61,10 +63,9 @@ export const BasicList = () => {
   let paginationProps = {
     showQuickJumper: true,
     pageSize: 10,
-    current: initialState.manageUser_self_current===undefined?1:initialState.manageUser_self_current,
+    current: manageUserCurrent==null?1:manageUserCurrent,
     onChange:(current, pageSize)=>{
-      setInitialState({ ...initialState, manageUser_self_current: current,
-       });
+      setManageUserCurrent(current);
     },
   };
   const pagePrivilegesShowTotal = (total) => {
@@ -104,8 +105,8 @@ export const BasicList = () => {
       if(filter != null && filter != ''){
         ret.data = ret.data.filter(array => array.user.match(filter));
       }
-      setInitialState({ ...initialState, manageUser_self: ret.data,
-        manageUser_self_totalCount: ret.data.length, manageUser_self_current: 1, });
+      setManageUser(ret.data);
+      setManageUserCurrent(1);
     }else{
       notification.error({
         message: ret.message,
@@ -118,10 +119,8 @@ export const BasicList = () => {
       if(filter != null && filter != ''){
         ret.data = ret.data.filter(array => array.user.match(filter));
       }
-      setInitialState({ ...initialState, manageUser_self: ret.data,
-        manageUser_self_totalCount: ret.data.length,
-        manageUser_self_current: 1,
-      });
+      setManageUser(ret.data);
+      setManageUserCurrent(1);
     }else{
       notification.error({
         message: ret.message,
@@ -336,7 +335,7 @@ export const BasicList = () => {
               rowKey="id"
               loading={loading}
               pagination={paginationProps}
-              dataSource={initialState.manageUser_self}
+              dataSource={manageUser}
               renderItem={(item) => (
                 <List.Item
                   actions={[
