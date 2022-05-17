@@ -22,6 +22,9 @@ const { Search } = Input;
 
 export const BasicList = () => {
   const intl = useIntl();
+  const [manageStorage, setManageStorage] = useState([]);
+  const [manageStorageCurrent, setManageStorageCurrent] = useState(undefined);
+  const [manageStorageTotal, setManageStorageTotal] = useState([]);
   const [done, setDone] = useState(false);
   const [addModalVisible, setAddModalVisible] = useState(false);
   const [editModalVisible, setEditModalVisible] = useState(false);
@@ -67,18 +70,18 @@ export const BasicList = () => {
       let messageJson = JSON.parse(ret.message || '{}');
       setPageStorageGroupHasMore(messageJson.hasMore);
       setPageStorageGroupToken(messageJson.token);
-      let size = initialState.manageStorage_self_total.length;
+      let size = manageStorageTotal.length;
       for(let i=0;i<ret.data.length;i++){
-        initialState.manageStorage_self_total[size+i] = ret.data[i];
+        manageStorageTotal[size+i] = ret.data[i];
       }
       if(searchContent != null && searchContent != ''){
-        initialState.manageStorage_self = initialState.manageStorage_self_total.filter(
+        manageStorage = manageStorageTotal.filter(
           array => array.value.match(searchContent));
       }else{
-        initialState.manageStorage_self = initialState.manageStorage_self_total;
+        manageStorage = manageStorageTotal;
       }
-      setInitialState({ ...initialState, manageStorage_self: initialState.manageStorage_self,
-        manageStorage_self_total: initialState.manageStorage_self_total, });
+      setManageStorage(manageStorage);
+      setManageStorageTotal(manageStorageTotal);
     }else{
       notification.error({
         message: ret.message,
@@ -113,10 +116,9 @@ export const BasicList = () => {
     showTotal: pageStorageGroupShowTotal,
     showQuickJumper: true,
     pageSize: 10,
-    current: initialState.manageStorage_self_current===undefined?1:initialState.manageStorage_self_current,
+    current: manageStorageCurrent==null?1:manageStorageCurrent,
     onChange:(current, pageSize)=>{
-      setInitialState({ ...initialState, manageStorage_self_current: current,
-       });
+      setManageStorageCurrent(current);
     },
   };
   const initItem = async(filter) => {
@@ -129,8 +131,9 @@ export const BasicList = () => {
       if(filter != null && filter != ''){
         ret.data = ret.data.filter(array => array.value.match(filter));
       }
-      setInitialState({ ...initialState, manageStorage_self: ret.data,
-        manageStorage_self_current: 1, manageStorage_self_total: ret.data, });
+      setManageStorage(ret.data);
+      setManageStorageTotal(ret.data);
+      setManageStorageCurrent(1);
     }else{
       notification.error({
         message: ret.message,
@@ -138,13 +141,12 @@ export const BasicList = () => {
     }
   }
   const change = async (filter)=>{
-      let data = initialState.manageStorage_self_total;
+      let data = manageStorageTotal;
       if(filter != null && filter != ''){
         data = data.filter(array => array.value.match(filter));
       }
-      setInitialState({ ...initialState, manageStorage_self: data,
-        manageStorage_self_current: 1,
-      });
+      setManageStorage(data);
+      setManageStorageCurrent(1);
   }
 
   const showEditModal = async (value) => {
@@ -199,21 +201,22 @@ export const BasicList = () => {
   const deleteItem = async (item) => {
     const ret = await deleteStorageGroupWithTenantUsingPOST({name:item.value});
     if(ret.code == '0'){
-      // initItem(searchContent);
-      for(let i=0;i<initialState.manageStorage_self.length;i++){
-        if(initialState.manageStorage_self[i].value==item.value){
-          initialState.manageStorage_self.splice(i,1);
+      for(let i=0;i<manageStorage.length;i++){
+        if(manageStorage[i].value==item.value){
+          manageStorage.splice(i,1);
           break;
         }
       }
-      for(let i=0;i<initialState.manageStorage_self_total.length;i++){
-        if(initialState.manageStorage_self_total[i].value==item.value){
-          initialState.manageStorage_self_total.splice(i,1);
+      for(let i=0;i<manageStorageTotal.length;i++){
+        if(manageStorageTotal[i].value==item.value){
+          manageStorageTotal.splice(i,1);
           break;
         }
       }
-      setInitialState({ ...initialState, manageStorage_self: initialState.manageStorage_self,
-        manageStorage_self_total: initialState.manageStorage_self_total, });
+      setManageStorage([]);
+      setManageStorage(manageStorage);
+      setManageStorageTotal([]);
+      setManageStorageTotal(manageStorageTotal);
       notification.success({
         message: 'Delete Storage Group ' + item.value + ' Success',
       });
@@ -273,18 +276,16 @@ export const BasicList = () => {
     let newSG = {timeseriesCount:0, value: 'root.'+value.name, key: uuid().replaceAll('-',''),
       ttl: getMillisecondFromTimeunit(value.ttl,value.timeunit),
     };
-    let l = initialState.manageStorage_self_total.length;
-    initialState.manageStorage_self_total[l] = newSG;
-    setInitialState({ ...initialState,
-      manageStorage_self_total: initialState.manageStorage_self_total, });
+    let l = manageStorageTotal.length;
+    manageStorageTotal[l] = newSG;
+    setManageStorageTotal(manageStorageTotal);
   }
 
   const handEditDone = (item) => {
-    for(let i=0;i<initialState.manageStorage_self_total.length;i++){
-      if(initialState.manageStorage_self_total[i].value==item.name){
-        initialState.manageStorage_self_total[i].ttl = getMillisecondFromTimeunit(item.ttl,item.timeunit);
-        setInitialState({ ...initialState,
-          manageStorage_self_total: initialState.manageStorage_self_total, });
+    for(let i=0;i<manageStorageTotal.length;i++){
+      if(manageStorageTotal[i].value==item.name){
+        manageStorageTotal[i].ttl = getMillisecondFromTimeunit(item.ttl,item.timeunit);
+        setManageStorageTotal(manageStorageTotal);
         break;
       }
     }
@@ -301,27 +302,6 @@ export const BasicList = () => {
     setEditable({});
     setCreateable(false);
   };
-
-  const handleDeleteItem = async(record) => {
-    const ret = await deleteTimeseriesWithTenantUsingPOST({path:record.timeseries})
-    if(ret.code == '0'){
-      notification.success({
-        message: 'Delete timeseries ' + record.timeseries + ' success',
-      });
-      for(let i=0;i<currentItem.length;i++){
-        if(currentItem[i].timeseries==record.timeseries){
-          currentItem.splice(i,1);
-          setCurrentItem([]);
-          setCurrentItem(currentItem);
-          break;
-        }
-      }
-    }else{
-      notification.error({
-        message: ret.message,
-      });
-    }
-  }
 
   return (
     <div>
@@ -344,7 +324,7 @@ export const BasicList = () => {
               rowKey="id"
               loading={loading}
               pagination={paginationProps}
-              dataSource={initialState.manageStorage_self}
+              dataSource={manageStorage}
               renderItem={(item) => (
                 <List.Item
                   actions={[
@@ -392,7 +372,6 @@ export const BasicList = () => {
         setCurrentFiltered={setCurrentItemFiltered}
         currentValue={currentValue}
         onDone={handleDone}
-        onDeleteItem={handleDeleteItem}
         editable={editable}
         setEditable={setEditable}
         createable={createable}

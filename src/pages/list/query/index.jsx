@@ -1,8 +1,9 @@
 import {MenuOutlined, EllipsisOutlined, InfoCircleOutlined, PlayCircleOutlined,
-  SaveOutlined, PauseCircleOutlined, PlusCircleOutlined, CloseCircleOutlined, FileSearchOutlined,
+  SaveOutlined, PauseCircleOutlined, PlusCircleOutlined, CloseCircleOutlined,
+  FileSearchOutlined, LineChartOutlined,
   ExportOutlined, ImportOutlined, SearchOutlined, QuestionCircleOutlined} from '@ant-design/icons';
 import {Badge, Button, Card, Statistic, Descriptions, Divider, Dropdown, Menu, Popover, Table, Tooltip, Empty,
-  notification, Upload, Typography, Form, Input, InputNumber, Popconfirm, Select } from 'antd';
+  notification, Upload, Typography, Form, Input, InputNumber, Popconfirm, Select, Radio } from 'antd';
 import { GridContent, PageContainer, RouteContext } from '@ant-design/pro-layout';
 import React, { Fragment, useEffect, useState, useRef } from 'react';
 import { useRequest, useModel, useIntl } from 'umi';
@@ -27,6 +28,7 @@ import '../../../../node_modules/codemirror/addon/hint/sql-hint';
 import '../../../../node_modules/codemirror/addon/comment/comment';
 import { v4 as uuid } from 'uuid';
 import { VList, EditableTable } from '../../../utils/virtual-table';
+import { VisualMiniArea } from '../../../utils/visualization-data';
 import {BetterInputNumber} from '../../../utils/BetterInputNumber';
 import ExportJsonExcel from "js-export-excel";
 const { Option } = Select;
@@ -86,7 +88,7 @@ const Self = () => {
       }}
     />
   );
-  const [tabStatus, seTabStatus] = useState({
+  const [tabStatus, setTabStatus] = useState({
     tabActiveKey: 'tab1',
     operationKey: 'query1',
   });
@@ -113,6 +115,11 @@ const Self = () => {
   const [editingKey, setEditingKey] = useState('');
   const [resultLocatorIndex, setResultLocatorIndex] = useState({});
   const [resultLocatorValue, setResultLocatorValue] = useState([]);
+  const [resultGraphicalColumn, setResultGraphicalColumn] = useState([]);
+  const resultGraphicalColumnRef = useRef([]);
+  useEffect(() => {
+    resultGraphicalColumnRef.current = resultGraphicalColumn;
+  }, [resultGraphicalColumn]);
   const [editableForm] = Form.useForm();
   const resultLocator =
   <>
@@ -395,6 +402,8 @@ const Self = () => {
   const runQuery = async() => {
     clearEditable();
     if(alertQueryTab()){ return; };
+    resultGraphicalColumn[activeQueryTabkey]=null;
+    setResultGraphicalColumn({...resultGraphicalColumn});
     resultMessage[activeQueryTabkey]=null;
     setResultMessage({...resultMessage});
     resultColumn[activeQueryTabkey]=[];
@@ -484,7 +493,16 @@ const Self = () => {
           }
           Object.keys(data[i]).map((item,index)=>{
             if(columnObj[item]==null){
-              columnObj[item] = {title:item
+              columnObj[item] = {
+                title:(item=='Time'||item=='Device')? item:
+                <>{item} <span title='Check to graph this column'><LineChartOutlined
+                checked={false}
+                onClick={(e)=>{
+                  let v = item;
+                  resultGraphicalColumnRef.current[activeQueryTabkey]=v;
+                  setResultGraphicalColumn({...resultGraphicalColumnRef.current});
+                }}
+                /></span></>
                 , editable:(item=='Time'||item=='Device')? false: true
                 , dataIndex: item, width:190
                 , key: item,
@@ -629,6 +647,13 @@ const Self = () => {
   };
   for(let i=1;i<100;i++){
     contentList['query'+i]=(
+    <>
+      <VisualMiniArea line
+       data={resultData['query'+i]} name={resultGraphicalColumn['query'+i]}
+       activeQueryTabkey={activeQueryTabkey}
+       resultGraphicalColumn={resultGraphicalColumn}
+       setResultGraphicalColumn={setResultGraphicalColumn}
+      />
       <EditableTable
         rowKey='index'
         loading={loading}
@@ -647,12 +672,14 @@ const Self = () => {
         wrapTableRef={wrapTableRef}
         timeDisplayForm={timeDisplayForm}
       />
+    </>
     );
   }
 
   const onOperationTabChange = (key) => {
     setReadOnly(false);
-    seTabStatus({ tabActiveKey: 'tab'+key, operationKey: 'query'+key });
+    setTabStatus({ tabActiveKey: 'tab'+key, operationKey: 'query'+key });
+
   };
 
   return (
@@ -664,10 +691,11 @@ const Self = () => {
       tabList={queryTabList}
       tabActiveKey={activeQueryTabkey}
     >
+
       <div className={styles.main}>
+
         <GridContent>
           <Card
-            id='s'
             className={styles.tabsCard}
             title={
               resultMessage[activeQueryTabkey]

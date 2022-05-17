@@ -47,7 +47,7 @@
     "not ie <= 10"
   ],
   "dependencies": {
-    "@ant-design/charts": "^0.9.4",
+    "@ant-design/charts": "^0.9.13",
     "@ant-design/icons": "^4.5.0",
     "@ant-design/pro-descriptions": "^1.6.8",
     "@ant-design/pro-form": "^1.18.3",
@@ -62,6 +62,7 @@
     "ahooks": "^2.0.0",
     "ant-virtual-table": "^0.1.11",
     "antd": "^4.14.0",
+    "ant-design-pro": "^2.3.2",
     "bizcharts": "^3.5.3-beta.0",
     "bizcharts-plugin-slider": "^2.1.1-beta.1",
     "codemirror": "^5.65.0",
