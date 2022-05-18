@@ -74,7 +74,10 @@ export const BasicList = () => {
     :null;
   }
   const pagePrivilegesAppend = async() => {
-    const ret = await listPrivilegesAppendWithTenantUsingPOST({token:pagePrivilegesToken});
+    const ret = await listPrivilegesAppendWithTenantUsingPOST({
+      token:pagePrivilegesToken,
+      umi_locale: localStorage.getItem("umi_locale"),
+    });
     if(ret.code == '0'){
       let messageJson = JSON.parse(ret.message || '{}');
       setPagePrivilegesHasMore(messageJson.hasMore);
@@ -100,7 +103,9 @@ export const BasicList = () => {
     }
   }
   const initUser = async(filter) => {
-    let ret = await listUserWithTenantUsingPOST();
+    let ret = await listUserWithTenantUsingPOST({
+      umi_locale: localStorage.getItem("umi_locale"),
+    });
     if(ret.code == '0'){
       if(filter != null && filter != ''){
         ret.data = ret.data.filter(array => array.user.match(filter));
@@ -114,7 +119,9 @@ export const BasicList = () => {
     }
   }
   const change = async (filter)=>{
-    const ret = await listUserWithTenantUsingPOST();
+    const ret = await listUserWithTenantUsingPOST({
+      umi_locale: localStorage.getItem("umi_locale"),
+    });
     if(ret.code == '0'){
       if(filter != null && filter != ''){
         ret.data = ret.data.filter(array => array.user.match(filter));
@@ -162,7 +169,10 @@ export const BasicList = () => {
   }
 
   const deleteUser = async (item) => {
-    const ret = await deleteUserWithTenantUsingPOST({user:item.user});
+    const ret = await deleteUserWithTenantUsingPOST({
+      user:item.user,
+      umi_locale: localStorage.getItem("umi_locale"),
+    });
     if(ret.code == '0'){
       initUser(searchContent);
       notification.success({
@@ -233,7 +243,10 @@ export const BasicList = () => {
   };
 
   const handleDeleteAuth = async(record) => {
-    const ret = await changePrivilegesWithTenantUsingPOST({user:currentUser, range: record.range})
+    const ret = await changePrivilegesWithTenantUsingPOST({
+      user:currentUser, range: record.range,
+      umi_locale: localStorage.getItem("umi_locale"),
+    })
     if(ret.code == '0'){
       for(let i=0;i<currentItem.length;i++){
         if(currentItem[i].range==record.range){
@@ -258,7 +271,10 @@ export const BasicList = () => {
   }
 
   const handleSaveAuth = async(record,e) => {
-    const ret = await changePrivilegesWithTenantUsingPOST({user:currentUser, auth:record.auth, range: record.range})
+    const ret = await changePrivilegesWithTenantUsingPOST({
+      user:currentUser, auth:record.auth, range: record.range,
+      umi_locale: localStorage.getItem("umi_locale"),
+    })
     if(ret.code == '0'){
       editable[record.key]=false;
       setEditable({...editable});
@@ -272,8 +288,11 @@ export const BasicList = () => {
   const privilegesInit = async(user) => {
     setPrivilegesSearchContent(null);
     let token = uuid().replaceAll('-','');
-    let ret = await listPrivilegesWithTenantUsingPOST({user:user==null?currentUser:user,
-      token:token});
+    let ret = await listPrivilegesWithTenantUsingPOST({
+      user:user==null?currentUser:user,
+      token:token,
+      umi_locale: localStorage.getItem("umi_locale"),
+    });
     if(ret.code=='0'){
       let messageJson = JSON.parse(ret.message || '{}');
       setPagePrivilegesHasMore(messageJson.hasMore);

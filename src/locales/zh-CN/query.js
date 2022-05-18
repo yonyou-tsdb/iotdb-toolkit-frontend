@@ -6,6 +6,7 @@ export default {
   'query.sql.export.backupNameWithOptional': '备份文件命名（选填）',
   'query.sql.export.compressionMode': '压缩方式',
   'query.sql.export.compression.no': '不压缩',
+  'query.sql.export.stop': '停止',
   'query.sql.export.timeFormat': '时间格式',
   'query.sql.export.timeFormat.number': '数字',
   'query.sql.export.timeFormat.default': '带时区标准时间',

@@ -3,7 +3,7 @@ import { notification, message } from 'antd';
 import { history, Link } from 'umi';
 import RightContent from '@/components/RightContent';
 import Footer from '@/components/Footer';
-import { currentUserUsingPOST as queryCurrentUser } from '@/services/swagger1/userController';
+import { currentUserUsingPOST } from '@/services/swagger1/userController';
 import { connectionLessUsingPOST, } from '@/services/swagger1/connectionController';
 import { BookOutlined, LinkOutlined } from '@ant-design/icons';
 import { parse, stringify } from 'qs';
@@ -23,7 +23,9 @@ export const initialStateConfig = {
 export async function getInitialState() {
   const fetchUserInfo = async () => {
     try {
-      const currentUser = await queryCurrentUser();
+      const currentUser = await currentUserUsingPOST({
+        umi_locale: localStorage.getItem("umi_locale"),
+      });
       return currentUser.data==null?currentUser:currentUser.data;
     } catch (error) {
       console.log(error);
@@ -34,7 +36,9 @@ export async function getInitialState() {
 
   const fetchConnectionLess = async () => {
     try {
-      let connectionPage = await connectionLessUsingPOST();
+      let connectionPage = await connectionLessUsingPOST({
+        umi_locale: localStorage.getItem("umi_locale"),
+      });
       return connectionPage.data==null?connectionPage:connectionPage.data;
     }catch (error) {
     }
@@ -102,7 +106,7 @@ export const request = {
     const { response } = error;
 
     if (!response) {
-      message.warn('您的会话过期，需要重新登录');
+      message.warn('Your session has expired, need to login again');
     }
     throw error;
   },

@@ -11,7 +11,7 @@ import DateUtil from '../../../utils/DateUtil';
 import OperationModal from './components/OperationModal';
 import AddModal from './components/AddStorageModal';
 import EditStorageModal from './components/EditStorageModal';
-import { showTimeseriesWithTenantUsingPOST, changePrivilegesWithTenantUsingPOST,
+import { showTimeseriesWithTenantUsingPOST,
   showSchemaWithTenantUsingPOST, showStorageWithTenantUsingPOST, showStorageAppendWithTenantUsingPOST,
   deleteStorageGroupWithTenantUsingPOST, deleteTimeseriesWithTenantUsingPOST,
   showTimeseriesAppendWithTenantUsingPOST,
@@ -65,7 +65,10 @@ export const BasicList = () => {
     :null;
   }
   const pageStorageGroupAppend = async() => {
-    const ret = await showStorageAppendWithTenantUsingPOST({token:pageStorageGroupToken})
+    const ret = await showStorageAppendWithTenantUsingPOST({
+      token:pageStorageGroupToken,
+      umi_locale: localStorage.getItem("umi_locale"),
+    })
     if(ret.code == '0'){
       let messageJson = JSON.parse(ret.message || '{}');
       setPageStorageGroupHasMore(messageJson.hasMore);
@@ -94,7 +97,10 @@ export const BasicList = () => {
     :null;
   }
   const pageTimeseriesAppend = async() => {
-    const ret = await showTimeseriesAppendWithTenantUsingPOST({token:pageTimeseriesToken});
+    const ret = await showTimeseriesAppendWithTenantUsingPOST({
+      token:pageTimeseriesToken,
+      umi_locale: localStorage.getItem("umi_locale"),
+    });
     if(ret.code=='0'){
       let messageJson = JSON.parse(ret.message || '{}');
       setPageTimeseriesHasMore(messageJson.hasMore);
@@ -123,7 +129,10 @@ export const BasicList = () => {
   };
   const initItem = async(filter) => {
     let token = uuid().replaceAll('-','');
-    let ret = await showStorageWithTenantUsingPOST({token: token});
+    let ret = await showStorageWithTenantUsingPOST({
+      token: token,
+      umi_locale: localStorage.getItem("umi_locale"),
+    });
     if(ret.code == '0'){
       let messageJson = JSON.parse(ret.message || '{}');
       setPageStorageGroupHasMore(messageJson.hasMore);
@@ -152,7 +161,10 @@ export const BasicList = () => {
   const showEditModal = async (value) => {
     setSearchTimeseriesContent(null);
     let token = uuid().replaceAll('-','');
-    let ret = await showTimeseriesWithTenantUsingPOST({path:value, token:token});
+    let ret = await showTimeseriesWithTenantUsingPOST({
+      path:value, token:token,
+      umi_locale: localStorage.getItem("umi_locale"),
+    });
     if(ret.code=='0'){
       let messageJson = JSON.parse(ret.message || '{}');
       setPageTimeseriesHasMore(messageJson.hasMore);
@@ -169,7 +181,10 @@ export const BasicList = () => {
 
   const searchTimeseries = async (currentValue, filter) => {
     let token = uuid().replaceAll('-','');
-    let ret = await showTimeseriesWithTenantUsingPOST({path:currentValue+'.'+filter+'*', token:token});
+    let ret = await showTimeseriesWithTenantUsingPOST({
+      path:currentValue+'.'+filter+'*', token:token,
+      umi_locale: localStorage.getItem("umi_locale"),
+    });
     if(ret.code=='0'){
       let messageJson = JSON.parse(ret.message || '{}');
       setPageTimeseriesHasMore(messageJson.hasMore);
@@ -199,7 +214,10 @@ export const BasicList = () => {
   }
 
   const deleteItem = async (item) => {
-    const ret = await deleteStorageGroupWithTenantUsingPOST({name:item.value});
+    const ret = await deleteStorageGroupWithTenantUsingPOST({
+      name:item.value,
+      umi_locale: localStorage.getItem("umi_locale"),
+    });
     if(ret.code == '0'){
       for(let i=0;i<manageStorage.length;i++){
         if(manageStorage[i].value==item.value){
@@ -302,7 +320,29 @@ export const BasicList = () => {
     setEditable({});
     setCreateable(false);
   };
-
+  const handleDeleteItem = async(record) => {
+    const ret = await deleteTimeseriesWithTenantUsingPOST({
+      path:record.timeseries,
+      umi_locale: localStorage.getItem("umi_locale"),
+    })
+    if(ret.code == '0'){
+      notification.success({
+        message: 'Delete timeseries ' + record.timeseries + ' success',
+      });
+      for(let i=0;i<currentItem.length;i++){
+        if(currentItem[i].timeseries==record.timeseries){
+          currentItem.splice(i,1);
+          setCurrentItem([]);
+          setCurrentItem(currentItem);
+          break;
+        }
+      }
+    }else{
+      notification.error({
+        message: ret.message,
+      });
+    }
+  }
   return (
     <div>
       <PageContainer title={initialState.activeConnectionDesc}>
@@ -372,6 +412,7 @@ export const BasicList = () => {
         setCurrentFiltered={setCurrentItemFiltered}
         currentValue={currentValue}
         onDone={handleDone}
+        onDeleteItem={handleDeleteItem}
         editable={editable}
         setEditable={setEditable}
         createable={createable}

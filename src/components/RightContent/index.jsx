@@ -46,14 +46,18 @@ const GlobalHeaderRight = () => {
               let msg = {type: "EXPORT_INTERRUPT", key: json.key};
               temp.send(JSON.stringify(msg));
             }}>
-              中止
+            {intl.formatMessage({
+              id: 'query.sql.export.stop',
+            })}
             </Button>)
           }else if(json.type=='IMPORT_START' || json.type=='IMPORT_ONGOING'){
             btn =  (<Button type="primary" danger size="small" onClick={() => {
               let msg = {type: "IMPORT_INTERRUPT", key: json.key};
               temp.send(JSON.stringify(msg));
             }}>
-              中止
+            {intl.formatMessage({
+              id: 'query.sql.export.stop',
+            })}
             </Button>)
           }
         ;
@@ -109,7 +113,8 @@ const GlobalHeaderRight = () => {
           destroyOnClose: true,
         }}
         onFinish={async (values) => {
-          let msg = await connectionAddThenReturnLessUsingPOST(values);
+          let msg = await connectionAddThenReturnLessUsingPOST(
+            {...values, umi_locale: localStorage.getItem("umi_locale")});
           if (msg.code === '0') {
             notification.success({
               message: msg.message,
@@ -242,7 +247,10 @@ const GlobalHeaderRight = () => {
               onClick={async () => {
                 try {
                   await form.validateFields();
-                  let msg = await connectionTestUsingPOST(form.getFieldsValue());
+                  let msg = await connectionTestUsingPOST({
+                    ...form.getFieldsValue(),
+                    umi_locale: localStorage.getItem("umi_locale"),
+                  });
                     let message = msg.message;
                     if (msg.code === '0') {
                       notification.success({

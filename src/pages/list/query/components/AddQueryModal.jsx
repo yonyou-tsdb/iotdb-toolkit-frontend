@@ -26,7 +26,10 @@ const OperationModal = (props) => {
   } = useRequest(async() => {
   });
   const saveQuery = async(name) => {
-    let ret = await querySaveUsingPOST({sqls: querySql[activeQueryTabkey], name: name});
+    let ret = await querySaveUsingPOST({
+      sqls: querySql[activeQueryTabkey], name: name,
+      umi_locale: localStorage.getItem("umi_locale"),
+    });
     CommonUtil.dealCallback(ret, (ret_)=>{
       notification.success({
         message: intl.formatMessage({id: 'query.sql.script.save.success',}) + ' ' + name,

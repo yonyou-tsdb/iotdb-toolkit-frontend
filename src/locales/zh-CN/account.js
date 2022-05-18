@@ -1,4 +1,5 @@
 export default {
+  'account.session.expired': '您的会话过期，需要重新登录',
   'account.account.text': '账号',
   'account.email.text': '邮箱',
   'account.password.text': '密码',

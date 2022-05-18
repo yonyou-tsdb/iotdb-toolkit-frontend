@@ -44,7 +44,10 @@ const Register = () => {
     let tokenRefCurrent = tokenRef.current;
     setToken(null);
     values.password = md5(values.password);
-    let ret = await registerUsingPOST({...values, token: tokenRefCurrent});
+    let ret = await registerUsingPOST({
+      ...values, token: tokenRefCurrent,
+      umi_locale: localStorage.getItem("umi_locale"),
+    });
     if(ret.code=='0'){
       notification.success({
         message: intl.formatMessage({

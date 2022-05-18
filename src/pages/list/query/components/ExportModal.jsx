@@ -15,7 +15,6 @@ import { Input, Button, Result, Table, Tag, Space, Checkbox, Popover, Modal, Pop
   notification, Descriptions, Col, Row, Radio } from 'antd';
 const { Search, TextArea } = Input;
 import { useRequest, useModel, useIntl } from 'umi';
-import { querySaveUsingPOST } from '@/services/swagger1/queryController';
 import moment from 'moment';
 import CommonUtil from '../../../../utils/CommonUtil';
 import {UnControlled as CodeMirror2} from '../../../../../node_modules/react-codemirror2'

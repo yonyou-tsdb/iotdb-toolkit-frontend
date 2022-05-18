@@ -41,8 +41,11 @@ const OperationModal = (props) => {
     try {
       await form.validateFields();
       let range = 'root';
-      let ret = await addPrivilegesWithTenantUsingPOST({user:currentUser, auth:addAuth,
-        timeseries:timeseries});
+      let ret = await addPrivilegesWithTenantUsingPOST({
+        user:currentUser, auth:addAuth,
+        timeseries:timeseries,
+        umi_locale: localStorage.getItem("umi_locale"),
+      });
       if(ret.code == '0'){
         let messageJson = JSON.parse(ret.message || '{}');
         onAddDone(messageJson);

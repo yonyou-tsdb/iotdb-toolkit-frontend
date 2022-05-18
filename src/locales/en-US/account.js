@@ -1,4 +1,5 @@
 export default {
+  'account.session.expired': 'Your session has expired, need to login again',
   'account.account.text': 'Account',
   'account.email.text': 'Email',
   'account.password.text': 'Password',

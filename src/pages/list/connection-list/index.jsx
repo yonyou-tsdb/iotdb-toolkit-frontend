@@ -61,6 +61,7 @@ export const BasicList = () => {
       pageSize: 10,
       pageNum: 1,
       aliasLike: searchContent,
+      umi_locale: localStorage.getItem("umi_locale")
     });
     setInitialState({ ...initialState, activeConnection: tenant,});
     setConnectList(ret.data.pageItems);
@@ -85,6 +86,7 @@ export const BasicList = () => {
       pageSize: 10,
       pageNum: current,
       aliasLike: aliasLike,
+      umi_locale: localStorage.getItem("umi_locale"),
     });
     setConnectList(ret2.data.pageItems);
     setConnectListTotalCount(ret2.data.totalCount);
@@ -100,6 +102,7 @@ export const BasicList = () => {
   const deleteItem = async(id) => {
     let ret = await connectionDeleteUsingPOST({
       id: id,
+      umi_locale: localStorage.getItem("umi_locale"),
     });
     if(ret.code == '0'){
       notification.success({
@@ -114,7 +117,10 @@ export const BasicList = () => {
   };
 
   const getConnection = async(id) => {
-    const ret = await connectionViewUsingPOST({connectionId:id});
+    const ret = await connectionViewUsingPOST({
+      connectionId:id,
+      umi_locale: localStorage.getItem("umi_locale"),
+    });
     if(ret.code==='0'){
       return ret.data;
     }else{
@@ -149,7 +155,10 @@ export const BasicList = () => {
 
   const setConnectionDefault = async (key, item) => {
     if(item.id==connectListDefault){
-      let msg = await connectionUndefaultUsingPOST({connectionId:item.id});
+      let msg = await connectionUndefaultUsingPOST({
+        connectionId:item.id,
+        umi_locale: localStorage.getItem("umi_locale"),
+      });
       if(msg.code == '0'){
         setConnectListDefault(null);
         notification.success({
@@ -158,7 +167,9 @@ export const BasicList = () => {
         });
       }
     }else{
-      let msg = await connectionDefaultUsingPOST({connectionId:item.id});
+      let msg = await connectionDefaultUsingPOST({
+        connectionId:item.id,
+        umi_locale: localStorage.getItem("umi_locale")});
       if(msg.code == '0'){
         setConnectListDefault(msg.data);
         notification.success({
@@ -244,7 +255,10 @@ export const BasicList = () => {
   };
 
   const handleSubmit = async(values, connectionId) => {
-    let ret = await connectionUpdateUsingPOST({...values, connectionId:connectionId});
+    let ret = await connectionUpdateUsingPOST({
+      ...values, connectionId:connectionId,
+      umi_locale: localStorage.getItem("umi_locale"),
+    });
     if(ret.code == '0'){
       setDoneResultStatus('success');
     }else{
@@ -257,7 +271,11 @@ export const BasicList = () => {
   const handleTest = async(form, connectionId) => {
     try {
       await form.validateFields();
-      let msg = await connectionTestByIdUsingPOST({...form.getFieldsValue(), connectionId:connectionId});
+      let msg = await connectionTestByIdUsingPOST({
+        ...form.getFieldsValue(),
+        connectionId:connectionId,
+        umi_locale: localStorage.getItem("umi_locale"),
+      });
         let message = msg.message;
         if (msg.code === '0') {
           notification.success({

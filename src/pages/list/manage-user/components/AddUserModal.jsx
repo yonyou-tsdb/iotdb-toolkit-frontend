@@ -35,7 +35,10 @@ const AddUserModal = (props) => {
       onFinish={async (values)=>{
         try {
           await form.validateFields();
-          let ret = await addUserWithTenantUsingPOST({user:values.userName, password:values.userPassword});
+          let ret = await addUserWithTenantUsingPOST({
+            user:values.userName, password:values.userPassword,
+            umi_locale: localStorage.getItem("umi_locale"),
+          });
           if(ret.code == '0'){
             initUser(searchContent);
             notification.success({

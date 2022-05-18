@@ -5,13 +5,15 @@ import { history, useModel, useIntl, useRequest  } from 'umi';
 import { stringify } from 'querystring';
 import HeaderDropdown from '../HeaderDropdown';
 import styles from './index.less';
-import { outLoginUsingPOST as outLogin } from '@/services/swagger1/userController';
+import { outLoginUsingPOST } from '@/services/swagger1/userController';
 import CookieUtil from '../../utils/CookieUtil';
 /**
  * 退出登录，并且将当前的 url 保存
  */
 const loginOut = async () => {
-  await outLogin();
+  await outLoginUsingPOST({
+    umi_locale: localStorage.getItem("umi_locale"),
+  });
   const { query = {}, pathname } = history.location;
   history.push({
     pathname: '/user/login/',

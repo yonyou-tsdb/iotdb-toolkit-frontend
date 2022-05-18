@@ -31,8 +31,11 @@ const OperationModal = (props) => {
       await form.validateFields();
       const entity = form.getFieldValue('granularity2');
       let path = currentValue + '.' + (entity == null?'':entity + '.') + form.getFieldValue('physical2');
-      let ret = await addTimeseriesWithTenantUsingPOST({path:path, dataType:form.getFieldValue('dataType2'),
-        encoding:form.getFieldValue('encoding2')});
+      let ret = await addTimeseriesWithTenantUsingPOST({
+        path:path, dataType:form.getFieldValue('dataType2'),
+        encoding:form.getFieldValue('encoding2'),
+        umi_locale: localStorage.getItem("umi_locale"),
+      });
       if(ret.code == '0'){
         notification.success({
           message: 'Add timeseries ' + path + ' success',

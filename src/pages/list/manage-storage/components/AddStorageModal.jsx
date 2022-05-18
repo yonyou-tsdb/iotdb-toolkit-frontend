@@ -42,7 +42,10 @@ const AddStorageModal = (props) => {
             const timeunit = form.getFieldValue('timeunit');
             ttl = getMillisecondFromTimeunit(ttl, timeunit);
           }
-          let ret = await addStorageGroupWithTenantUsingPOST({name:'root.' + values.name, ttl: ttl});
+          let ret = await addStorageGroupWithTenantUsingPOST({
+            name:'root.' + values.name, ttl: ttl,
+            umi_locale: localStorage.getItem("umi_locale"),
+          });
           if(ret.code == '0'){
             onDone(values);
             notification.success({

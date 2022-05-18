@@ -28,7 +28,7 @@ const SecurityView = () => {
     });
   }
   const deleteAccountConfirm = async () => {
-    let ret = await deleteAccountUsingPOST();
+    let ret = await deleteAccountUsingPOST({umi_locale: localStorage.getItem("umi_locale"),});
     if(ret.code=='0'){
       notification.success({
         message: ((currentUser!=null && currentUser.name!=null)?currentUser.name:'') + ' ' +

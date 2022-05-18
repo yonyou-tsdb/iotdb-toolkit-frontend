@@ -33,7 +33,10 @@ const ResetPassword = ({ location }) => {
   const onFinish = async (values) => {
     setSubmitting(true);
     values.password = md5(values.password);
-    let ret = await resetUpdatePasswordUsingPOST({password:values.password, id:id, token:token});
+    let ret = await resetUpdatePasswordUsingPOST({
+      password:values.password, id:id, token:token,
+      umi_locale: localStorage.getItem("umi_locale"),
+    });
     if(ret.code=='0'){
       notification.success({
         message: intl.formatMessage({id: 'account.setting.password.success',}),

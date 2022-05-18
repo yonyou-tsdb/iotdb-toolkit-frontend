@@ -33,6 +33,7 @@ const OperationModal = (props) => {
       pageSize: 10,
       pageNum: current,
       nameLike: nameLike,
+      umi_locale: localStorage.getItem("umi_locale"),
     });
     CommonUtil.dealCallback(ret, (_ret)=>{
       let index = 0;
@@ -46,6 +47,7 @@ const OperationModal = (props) => {
       pageSize: 10,
       pageNum: 1,
       nameLike: searchContent,
+      umi_locale: localStorage.getItem("umi_locale"),
     });
     CommonUtil.dealCallback(ret, (_ret)=>{
       let index = 0;

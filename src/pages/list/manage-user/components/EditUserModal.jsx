@@ -35,7 +35,10 @@ const EditUserModal = (props) => {
       onFinish={async (values)=>{
         try {
           await form.validateFields();
-          let ret = await editUserWithTenantUsingPOST({user:editUser.user, password:values.userPassword});
+          let ret = await editUserWithTenantUsingPOST({
+            user:editUser.user, password:values.userPassword,
+            umi_locale: localStorage.getItem("umi_locale"),
+          });
           if(ret.code == '0'){
             notification.success({
               message: 'Edit User ' + values.userName + ' Success',

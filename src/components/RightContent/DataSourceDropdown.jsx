@@ -36,7 +36,9 @@ const DataSourceDropdown = ({ menu }) => {
     return alias+' => '+username+'@'+host+':'+port;
   }
   const reloadMenu = async() => {
-    const ret = await connectionLessUsingPOST();
+    const ret = await connectionLessUsingPOST({
+      umi_locale: localStorage.getItem("umi_locale"),
+    });
     if(ret.code == '0'){
       setInitialState({ ...initialState, connectionLess: ret.data });
     }

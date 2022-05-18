@@ -21,8 +21,11 @@ const BaseView = () => {
   const handleFinish = async (values) => {
     const encodePasswordOrigin = md5(values.passwordOrigin);
     const encodePassword = md5(values.password);
-    let ret = await updatePasswordUsingPOST({passwordOrigin:encodePasswordOrigin,
-       password: encodePassword});
+    let ret = await updatePasswordUsingPOST({
+      passwordOrigin:encodePasswordOrigin,
+      password: encodePassword,
+      umi_locale: localStorage.getItem("umi_locale"),
+    });
     if(ret.code=='0'){
      notification.success({
        message: intl.formatMessage({id: 'account.setting.password.success',}),

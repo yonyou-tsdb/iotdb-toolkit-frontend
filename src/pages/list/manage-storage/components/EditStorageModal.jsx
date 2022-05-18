@@ -43,7 +43,10 @@ const EditStorageModal = (props) => {
             const timeunit = form.getFieldValue('timeunit');
             ttl = getMillisecondFromTimeunit(ttl, timeunit);
           }
-          let ret = await editStorageGroupWithTenantUsingPOST({name:editItem.value, ttl: ttl});
+          let ret = await editStorageGroupWithTenantUsingPOST({
+            name:editItem.value, ttl: ttl,
+            umi_locale: localStorage.getItem("umi_locale"),
+          });
           if(ret.code == '0'){
             console.log(values);
             onDone({name:editItem.value, ...values});

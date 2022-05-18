@@ -8,8 +8,8 @@ import { GridContent, PageContainer, RouteContext } from '@ant-design/pro-layout
 import React, { Fragment, useEffect, useState, useRef } from 'react';
 import { useRequest, useModel, useIntl } from 'umi';
 import { queryAdvancedProfile } from './service';
-import { querySqlWithTenantUsingPOST, queryAllUsingPOST,querySaveUsingPOST,
-  queryExportCsvWithTenantUsingPOST, querySqlAppendWithTenantUsingPOST, updatePointWithTenantUsingPOST,
+import { querySqlWithTenantUsingPOST, queryAllUsingPOST,
+  querySqlAppendWithTenantUsingPOST, updatePointWithTenantUsingPOST,
  } from '@/services/swagger1/queryController';
 import styles from './style.less';
 import CommonUtil from '../../../utils/CommonUtil';
@@ -226,8 +226,10 @@ const Self = () => {
     let tabToken = uuid().replaceAll('-','');
     queryTabTokens[activeQueryTabkeyRef.current] = tabToken;
     setQueryTabTokens({...queryTabTokens});
-    let ret = await querySqlAppendWithTenantUsingPOST({queryToken: queryToken[activeQueryTabkey],
-      tabKey: activeQueryTabkeyRef.current, tabToken: tabToken
+    let ret = await querySqlAppendWithTenantUsingPOST({
+      queryToken: queryToken[activeQueryTabkey],
+      tabKey: activeQueryTabkeyRef.current, tabToken: tabToken,
+      umi_locale: localStorage.getItem("umi_locale"),
     });
     if(ret.code=='0'){
       resultColumn[activeQueryTabkey]=[];
@@ -420,8 +422,10 @@ const Self = () => {
     let tabToken = uuid().replaceAll('-','');
     queryTabTokens[activeQueryTabkeyRef.current] = tabToken;
     setQueryTabTokens({...queryTabTokens});
-    let ret = await querySqlWithTenantUsingPOST({sqls: sql, queryToken: queryToken[activeQueryTabkey],
-      tabKey: activeQueryTabkeyRef.current, tabToken: tabToken});
+    let ret = await querySqlWithTenantUsingPOST({
+      sqls: sql, queryToken: queryToken[activeQueryTabkey],
+      tabKey: activeQueryTabkeyRef.current, tabToken: tabToken,
+      umi_locale: localStorage.getItem("umi_locale")});
     if(ret.code == '0'){
       let messageJson = JSON.parse(ret.message || '{}');
       if(messageJson.tabToken != queryTabTokensRef.current[messageJson.tabKey]){
@@ -543,14 +547,20 @@ const Self = () => {
 
   const updatePoint = async(timestamp, point, value) => {
     if(alertQueryTab()){ return; };
-    let ret = await updatePointWithTenantUsingPOST({point: point, value: value,
-      timestamp: timestamp});
+    let ret = await updatePointWithTenantUsingPOST({
+      point: point, value: value,
+      timestamp: timestamp,
+      umi_locale: localStorage.getItem("umi_locale"),
+    });
     return ret;
   }
 
   const showSqlModal = async() => {
     if(alertQueryTab()){ return; };
-    let ret = await queryAllUsingPOST({pageSize:10, pageNum: 1});
+    let ret = await queryAllUsingPOST({
+      pageSize:10, pageNum: 1,
+      umi_locale: localStorage.getItem("umi_locale"),
+    });
     CommonUtil.dealCallback(ret, (ret_)=>{
       let index = 0;
       ret_.data.pageItems.map((item)=>{item['key']=index++;});
@@ -566,7 +576,8 @@ const Self = () => {
       return;
     }
     let url = '/api/query/exportCsv?sqls='+o.queryCommand+'&timeformat='+o.timeformat+'&timeZone='
-      +o.timeZone+'&compress='+o.compress+'&targetFile='+(o.targetFile==null?'dump':o.targetFile);
+      +o.timeZone+'&compress='+o.compress+'&targetFile='+(o.targetFile==null?'dump':o.targetFile
+      )+'&umi_locale='+localStorage.getItem("umi_locale");
     CommonUtil.download2(url);
   }
   const action = (

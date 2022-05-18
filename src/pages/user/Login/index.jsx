@@ -68,7 +68,10 @@ const Login = () => {
     try {
       // 登录
       values.password = md5(values.password);
-      let msg = await loginAccountUsingPOST({ ...values, type });
+      let msg = await loginAccountUsingPOST({
+         ...values, type,
+         umi_locale: localStorage.getItem("umi_locale"),
+        });
       let errorMsg = msg.message;
       msg = msg.data == null ? msg : msg.data;
       if (msg.status === 'ok') {
@@ -105,7 +108,10 @@ const Login = () => {
     changeCaptchaToDefault();
     let tokenRefCurrent = tokenRef.current;
     setToken(null);
-    let ret = await sendResetPasswordMailUsingPOST({...values, token: tokenRefCurrent});
+    let ret = await sendResetPasswordMailUsingPOST({
+      ...values, token: tokenRefCurrent,
+      umi_locale: localStorage.getItem("umi_locale"),
+    });
     if(ret.code=='0'){
       notification.success({
         message: '找回密码邮件已经发送至邮箱中，请您于24小时内进行操作',
@@ -358,7 +364,7 @@ const Login = () => {
             float: 'right',
           }}>
             <FormattedMessage id='app.settings.version.is' />
-            0.12.4
+            0.12.5-SNAPSHOT
           </Space>
         </div>
       </div>

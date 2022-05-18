@@ -6,6 +6,7 @@ export default {
   'query.sql.export.backupNameWithOptional': 'Backup file name (optional)',
   'query.sql.export.compressionMode': 'Compression Mode',
   'query.sql.export.compression.no': 'No Compression',
+  'query.sql.export.stop': 'Stop',
   'query.sql.export.timeFormat': 'Time Format',
   'query.sql.export.timeFormat.number': 'Number',
   'query.sql.export.timeFormat.default': 'Time with time zone',
