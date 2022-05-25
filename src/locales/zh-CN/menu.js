@@ -9,6 +9,8 @@ export default {
   'menu.datasource-manage.overview': '总览',
   'menu.datasource-manage.connection-list': '管理连接',
   'menu.datasource-manage.manage-user': '管理用户',
+  'menu.monitor-manage': '监控管理',
+  'menu.monitor-manage.monitor': '监控',
   'menu.welcome': '欢迎',
   'menu.more-blocks': '更多区块',
   'menu.home': '首页',

@@ -119,10 +119,10 @@ export default defineConfig({
           hideInMenu: true,
         },
         {
-          name: 'query',
+          name: 'monitor',
           icon: 'smile',
-          path: '/profile/advanced/',
-          component: './profile/advanced',
+          path: '/list/monitor/',
+          component: './list/monitor',
           hideInMenu: true,
         },
         {
@@ -145,6 +145,20 @@ export default defineConfig({
           path: '/result/autoSkip/',
           component: './result/autoSkip',
           hideInMenu: true,
+        },
+      ],
+    },
+    {
+      path: '/',
+      name: 'monitor-manage',
+      icon: 'fund',
+      hideInMenu: true,
+      routes: [
+        {
+          name: 'monitor',
+          icon: 'smile',
+          path: '/list/monitor/',
+          component: './list/monitor',
         },
       ],
     },

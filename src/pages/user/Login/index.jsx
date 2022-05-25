@@ -1,7 +1,8 @@
 import { GithubOutlined, ReadOutlined, LockOutlined, TaobaoCircleOutlined, UserOutlined,
   WeiboCircleOutlined, MailOutlined, EditOutlined,
 } from '@ant-design/icons';
-import { Alert, Space, message, Tabs, notification, Checkbox, Form, Row, Col } from 'antd';
+import { Alert, Space, Button, message, Tabs, notification, Checkbox, Form, Row, Col } from 'antd';
+const FormItem = Form.Item;
 import React, { useState, useEffect, useRef } from 'react';
 import ProForm, { ProFormCaptcha, ProFormCheckbox, ProFormText } from '@ant-design/pro-form';
 import { useIntl, Link, history, FormattedMessage, SelectLang, useModel } from 'umi';
@@ -186,19 +187,7 @@ const Login = () => {
               autoLogin: true,
             }}
             submitter={{
-              searchConfig: {
-                submitText: intl.formatMessage({
-                  id: type === 'account'?'pages.login.submit':'pages.reset.submit',
-                }),
-              },
-              render: (_, dom) => dom.pop(),
-              submitButtonProps: {
-                loading: submitting,
-                size: 'large',
-                style: {
-                  width: '100%',
-                },
-              },
+              render: (_, dom) => {},
             }}
             onFinish={async (values) => {
               if(type === 'account'){
@@ -354,6 +343,22 @@ const Login = () => {
                 <FormattedMessage id='pages.login.registerAccount' defaultMessage="注册账号" />
               </Link>
             </div>
+            <FormItem>
+              <Button
+                size="large"
+                loading={submitting}
+                className={styles.submit}
+                type="primary"
+                htmlType="submit"
+                style={{
+                  width: '100%',
+                }}
+              >
+                <span>{intl.formatMessage({
+                  id: type === 'account'?'pages.login.submit':'pages.reset.submit',
+                })}</span>
+              </Button>
+            </FormItem>
           </ProForm>
           <Space className={styles.other}>
             <FormattedMessage id="pages.login.relatedLinks" defaultMessage="相关链接" />

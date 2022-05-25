@@ -1,7 +1,7 @@
 // import Charts from 'ant-design-pro1/lib/Charts';
-import Charts from '../../../node_modules/ant-design-pro1/lib/Charts';
+import Charts from '../../../node_modules/ant-design-pro/lib/Charts';
 const {ChartCard, MiniArea, MiniBar, MiniProgress, Bar} = Charts;
-import NumberInfo from '../../../node_modules/ant-design-pro1/lib/NumberInfo';
+import NumberInfo from '../../../node_modules/ant-design-pro/lib/NumberInfo';
 import {CloseCircleOutlined} from '@ant-design/icons';
 import moment from 'moment';
 const BuildVisualizationData = (props) => {

@@ -610,6 +610,7 @@ const Self = () => {
             </span>}>
               <QuestionCircleOutlined />
             </Tooltip>
+            <span> </span>
             <ButtonGroup>
               <Button onClick={runQuery} type="primary"><PlayCircleOutlined />
                 {intl.formatMessage({id: 'query.sql.execute',})}

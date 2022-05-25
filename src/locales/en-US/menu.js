@@ -9,6 +9,8 @@ export default {
   'menu.datasource-manage.overview': 'Overview',
   'menu.datasource-manage.connection-list': 'Manage Connection',
   'menu.datasource-manage.manage-user': 'Manage User',
+  'menu.monitor-manage': 'Monitor Manage',
+  'menu.monitor-manage.monitor': 'Monitor',
   'menu.welcome': 'Welcome',
   'menu.more-blocks': 'More Blocks',
   'menu.home': 'Home',
