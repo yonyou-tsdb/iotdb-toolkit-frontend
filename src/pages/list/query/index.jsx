@@ -126,7 +126,6 @@ const Self = () => {
     <Divider type="vertical" />
     <span>{intl.formatMessage({id: 'query.result.locate.text',})} </span>
     <BetterInputNumber style={{
-      width: 170,
       size: "small",
     }} placeholder="index or Time.."
       min={0}

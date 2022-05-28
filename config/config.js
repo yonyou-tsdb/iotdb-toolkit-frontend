@@ -152,7 +152,7 @@ export default defineConfig({
       path: '/',
       name: 'monitor-manage',
       icon: 'fund',
-      hideInMenu: true,
+      hideInMenu: false,
       routes: [
         {
           name: 'monitor',
