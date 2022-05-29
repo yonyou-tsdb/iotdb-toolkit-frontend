@@ -48,4 +48,5 @@ export default {
   'query.result.locate.by': 'by',
   'query.result.locate.or': 'or',
   'query.result.expired': 'Query has expired',
+  'query.result.visual.numberReachesLimit': 'The number of visualized data reaches the limit',
 }

@@ -1,4 +1,4 @@
-// import Charts from 'ant-design-pro1/lib/Charts';
+import {Badge, Button, Card, Statistic, Descriptions, Divider, } from 'antd';
 import {ChartCard, MiniArea, MiniBar, MiniProgress, Bar}
  from '../../../node_modules/ant-design-pro/lib/Charts';
 import { Line } from '@ant-design/charts';
@@ -10,12 +10,12 @@ const BuildVisualizationData = (props) => {
 }
 
 export const VisualMiniArea = (props: {}) => {
-  const { name, data, line, resultGraphicalColumn, setResultGraphicalColumn,
+  const { names, data, line, resultGraphicalColumn, setResultGraphicalColumn,
     activeQueryTabkey } = props;
   const visitData = [];
   const beginDay = new Date().getTime();
   const limit = 1000;
-  if(data!=null && data.length>0 && name != null){
+  if(data!=null && data.length>0 && names != null && names.length>0){
     let segment = limit / data.length;
     let totalSegment = 0.0;
     for (let i = 0; i < data.length; i++) {
@@ -23,11 +23,11 @@ export const VisualMiniArea = (props: {}) => {
       if(totalSegment >= 1){
         totalSegment -= 1;
         Object.keys(data[i]).map((item,index)=>{
-          if(item == name){
+          if(names.indexOf(item)>=0){
             visitData.push({
               date: parseInt(data[i]['Time']),
-              value: parseFloat(data[i][name]),
-              type: name,
+              value: parseFloat(data[i][item]),
+              type: item,
             });
           }
           return;
@@ -46,7 +46,7 @@ export const VisualMiniArea = (props: {}) => {
       },
     },
     legend: {
-      position: 'top',
+      position: 'bottom',
     },
     seriesField: 'type',
     responsive: true,
@@ -54,14 +54,25 @@ export const VisualMiniArea = (props: {}) => {
       height: 200,
     }
   };
-  return <ChartCard title={<><b>{name}</b> <CloseCircleOutlined
-  style={{cursor: 'pointer'}} title='close' onClick={()=>{
-    resultGraphicalColumn[activeQueryTabkey]=null;
-    setResultGraphicalColumn({...resultGraphicalColumn});
-  }} /></>} contentHeight={250} >
-  <NumberInfo subTitle={<>total : {data.length}  sampling : {visitData.length}</>} />
+  return <>
+  <NumberInfo subTitle={<>
+
+  {names.map((name) => (<span key={name}><span > {name} </span>
+    <span>
+    <CloseCircleOutlined
+      style={{cursor: 'pointer'}} title={`remove '${name}' from graph`} onClick={()=>{
+        let i = resultGraphicalColumn[activeQueryTabkey].indexOf(name);
+        if(i>=0){
+          resultGraphicalColumn[activeQueryTabkey].splice(i,1);
+          setResultGraphicalColumn({...resultGraphicalColumn});
+        }
+      }} /> </span><Divider type="vertical" /></span>))}
+    <br/>total : {data.length}
+    <Divider type="vertical" />
+    sampling : {Math.min(data.length,1000)}
+    </>} />
   <Line {...config2} />
-  </ChartCard>;
+  </>;
   }else{
     return null;
   }

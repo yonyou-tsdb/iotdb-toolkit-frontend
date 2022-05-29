@@ -48,4 +48,5 @@ export default {
   'query.result.locate.by': '按',
   'query.result.locate.or': '或',
   'query.result.expired': '查询已过期',
+  'query.result.visual.numberReachesLimit': '可视化数据数量达到上限',
 }

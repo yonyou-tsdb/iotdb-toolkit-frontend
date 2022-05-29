@@ -1,9 +1,9 @@
 import {MenuOutlined, EllipsisOutlined, InfoCircleOutlined, PlayCircleOutlined,
   SaveOutlined, PauseCircleOutlined, PlusCircleOutlined, CloseCircleOutlined,
-  FileSearchOutlined, LineChartOutlined,
+  FileSearchOutlined, LineChartOutlined, EyeOutlined,
   ExportOutlined, ImportOutlined, SearchOutlined, QuestionCircleOutlined} from '@ant-design/icons';
 import {Badge, Button, Card, Statistic, Descriptions, Divider, Dropdown, Menu, Popover, Table, Tooltip, Empty,
-  notification, Upload, Typography, Form, Input, InputNumber, Popconfirm, Select, Radio } from 'antd';
+  notification, message, Upload, Typography, Form, Input, InputNumber, Popconfirm, Select, Radio } from 'antd';
 import { GridContent, PageContainer, RouteContext } from '@ant-design/pro-layout';
 import React, { Fragment, useEffect, useState, useRef } from 'react';
 import { useRequest, useModel, useIntl } from 'umi';
@@ -156,8 +156,8 @@ const Self = () => {
     <Divider type="vertical" />
     <a onClick={()=>{
       let header = resultColumnRef.current[activeQueryTabkey].map((item,index)=>{
-            return item.title;
-      }).filter(item => item!='index');
+          if(item.rawTitle!=null){return item.rawTitle;}
+      }).filter(item => (item!=null && item!='index'));
       exportExcel(activeQueryTabkey,header,resultDataRef.current[activeQueryTabkey]);
     }}>{intl.formatMessage({id: 'query.result.download',})}</a>
   </>;
@@ -179,6 +179,32 @@ const Self = () => {
     var toExcel = new ExportJsonExcel(option); //new
     toExcel.saveExcel();
   }
+  const visualize = (item)=>{
+    let v = item;
+    let i = resultGraphicalColumnRef.current[activeQueryTabkey].indexOf(v);
+    if(i<0){
+      if(resultGraphicalColumnRef.current[activeQueryTabkey].length>=5){
+        message.warn(intl.formatMessage({id:'query.result.visual.numberReachesLimit',}));
+      }else{
+        resultGraphicalColumnRef.current[activeQueryTabkey].push(v);
+        setResultGraphicalColumn({...resultGraphicalColumnRef.current});
+      }
+    }else{
+      resultGraphicalColumnRef.current[activeQueryTabkey].splice(i,1);
+      setResultGraphicalColumn({...resultGraphicalColumnRef.current});
+    }
+  }
+  const buildResultColumnTitle = (item)=>(
+    (item=='Time'||item=='Device')? item:
+    <>{item} <span title={`Click to visualize '${item}'`}><LineChartOutlined
+      onClick={() => {visualize(item)}}
+    />
+    </span>
+    <span> </span>
+    <span title={`Click to explore data in '${item}' `}>
+    <EyeOutlined onClick={() => {alert('Coming soon')}} />
+    </span></>
+  );
   const changeTimeDisplayForm = (v) => {
     timeDisplayForm[activeQueryTabkey] = v;
     setTimeDisplayForm({...timeDisplayForm});
@@ -282,8 +308,8 @@ const Self = () => {
       for(let j=0;j<data.length;j++){
         Object.keys(data[j]).map((item,index)=>{
           if(resultColumnRef.current[activeQueryTabkey][item]==null){
-            let temp = {title:
-              item, editable: true
+            let temp = {rawTitle:item,
+              title:buildResultColumnTitle(item), editable: true
               , dataIndex: item, width: 200
               , key: item,render: val => {
               return val;}
@@ -403,7 +429,7 @@ const Self = () => {
   const runQuery = async() => {
     clearEditable();
     if(alertQueryTab()){ return; };
-    resultGraphicalColumn[activeQueryTabkey]=null;
+    resultGraphicalColumn[activeQueryTabkey]=[];
     setResultGraphicalColumn({...resultGraphicalColumn});
     resultMessage[activeQueryTabkey]=null;
     setResultMessage({...resultMessage});
@@ -497,15 +523,8 @@ const Self = () => {
           Object.keys(data[i]).map((item,index)=>{
             if(columnObj[item]==null){
               columnObj[item] = {
-                title:(item=='Time'||item=='Device')? item:
-                <>{item} <span title='Check to graph this column'><LineChartOutlined
-                checked={false}
-                onClick={(e)=>{
-                  let v = item;
-                  resultGraphicalColumnRef.current[activeQueryTabkey]=v;
-                  setResultGraphicalColumn({...resultGraphicalColumnRef.current});
-                }}
-                /></span></>
+                rawTitle:item,
+                title:buildResultColumnTitle(item)
                 , editable:(item=='Time'||item=='Device')? false: true
                 , dataIndex: item, width:190
                 , key: item,
@@ -660,7 +679,7 @@ const Self = () => {
     contentList['query'+i]=(
     <>
       <VisualMiniArea line
-       data={resultData['query'+i]} name={resultGraphicalColumn['query'+i]}
+       data={resultData['query'+i]} names={resultGraphicalColumn['query'+i]}
        activeQueryTabkey={activeQueryTabkey}
        resultGraphicalColumn={resultGraphicalColumn}
        setResultGraphicalColumn={setResultGraphicalColumn}
