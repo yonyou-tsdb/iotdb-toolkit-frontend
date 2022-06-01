@@ -49,4 +49,12 @@ export default {
   'query.result.locate.or': '或',
   'query.result.expired': '查询已过期',
   'query.result.visual.numberReachesLimit': '可视化数据数量达到上限',
+  'query.result.dataExplore': '数据探索',
+  'query.result.dataExplore.quantity': '数量',
+  'query.result.dataExplore.average': '平均值',
+  'query.result.dataExplore.max': '最大值',
+  'query.result.dataExplore.min': '最小值',
+  'query.result.dataExplore.firstAppearedIn': '首次出现于',
+  'query.result.dataExplore.variance': '方差',
+  'query.result.dataExplore.standardDeviation': '标准差',
 }

@@ -49,4 +49,12 @@ export default {
   'query.result.locate.or': 'or',
   'query.result.expired': 'Query has expired',
   'query.result.visual.numberReachesLimit': 'The number of visualized data reaches the limit',
+  'query.result.dataExplore': 'Data Explore',
+  'query.result.dataExplore.quantity': 'Quantity',
+  'query.result.dataExplore.average': 'Average Value',
+  'query.result.dataExplore.max': 'Max Value',
+  'query.result.dataExplore.min': 'Min Value',
+  'query.result.dataExplore.firstAppearedIn': 'First Appeared In',
+  'query.result.dataExplore.variance': 'Variance',
+  'query.result.dataExplore.standardDeviation': 'Standard Deviation',
 }

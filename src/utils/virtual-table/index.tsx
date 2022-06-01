@@ -362,6 +362,7 @@ const BuildEditableTable = (props) => {
                   let item = newData[index];
                   item[dataIndex] = row[dataIndex];
                   data[active] = newData;
+                  setData([]);
                   setData({...data});
                 }
               }else{

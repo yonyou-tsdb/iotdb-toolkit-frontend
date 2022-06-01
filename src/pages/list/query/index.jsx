@@ -15,6 +15,7 @@ import styles from './style.less';
 import CommonUtil from '../../../utils/CommonUtil';
 import OperationModal from './components/OperationModal';
 import AddQueryModal from './components/AddQueryModal';
+import DataExploreModal from './components/DataExploreModal';
 import ExportModal from './components/ExportModal';
 import ImportModal from './components/ImportModal';
 import { format as sqlFormat } from 'sql-formatter';
@@ -47,6 +48,7 @@ const Self = () => {
   const [addQueryVisible, setAddQueryVisible] = useState(false);
   const [exportModalVisible, setExportModalVisible] = useState(false);
   const [importModalVisible, setImportModalVisible] = useState(false);
+  const [dataExploreModalVisible, setDataExploreModalVisible] = useState(false);
   const [queryTabTokens, setQueryTabTokens] = useState({});
   const queryTabTokensRef = useRef([]);
   useEffect(() => {
@@ -120,6 +122,13 @@ const Self = () => {
   useEffect(() => {
     resultGraphicalColumnRef.current = resultGraphicalColumn;
   }, [resultGraphicalColumn]);
+  const [exploreColumnName, setExploreColumnName] = useState(undefined);
+  const [exploreDataQuantity, setExploreDataQuantity] = useState(undefined);
+  const [exploreDataAverage, setExploreDataAverage] = useState(undefined);
+  const [exploreDataMax, setExploreDataMax] = useState({});
+  const [exploreDataMin, setExploreDataMin] = useState({});
+  const [exploreDataVariance, setExploreDataVariance] = useState(undefined);
+  const [exploreDataStandardDeviation, setExploreDataStandardDeviation] = useState(undefined);
   const [editableForm] = Form.useForm();
   const resultLocator =
   <>
@@ -202,9 +211,53 @@ const Self = () => {
     </span>
     <span> </span>
     <span title={`Click to explore data in '${item}' `}>
-    <EyeOutlined onClick={() => {alert('Coming soon')}} />
+    <EyeOutlined onClick={() => {
+      exploreData(item);
+    }} />
     </span></>
   );
+  const exploreData = (columnName) => {
+    setDataExploreModalVisible(true);
+    setExploreColumnName(columnName);
+    let quantity = 0;
+    let sum = 0.0;
+    let max = {time:null, value:null};
+    let min = {time:null, value:null};
+    let variance = NaN;
+    let standardDeviation = NaN;
+    resultDataRef.current[activeQueryTabkey].map(item => {
+      if(item != null && item[columnName] != null){
+        quantity++;
+        let value = parseFloat(item[columnName]);
+        sum += value;
+        if(max.value==null || max.value<value){
+          max.time = item['Time'];
+          max.value = value;
+        }
+        if(min.value==null || min.value>value){
+          min.time = item['Time'];
+          min.value = value;
+        }
+      }
+    });
+    let average = (sum / quantity).toFixed(3);
+    if(average!=NaN){
+      let varianceSum = 0.0;
+      resultDataRef.current[activeQueryTabkey].map(item => {
+        if(item != null && item[columnName] != null){
+          varianceSum += Math.pow((item[columnName] - average), 2);
+        }
+      });
+      variance = (varianceSum / quantity).toFixed(3);
+      standardDeviation = Math.sqrt(variance).toFixed(3);
+    }
+    setExploreDataQuantity(quantity);
+    setExploreDataAverage(average);
+    setExploreDataMax(max);
+    setExploreDataMin(min);
+    setExploreDataVariance(variance);
+    setExploreDataStandardDeviation(standardDeviation);
+  }
   const changeTimeDisplayForm = (v) => {
     timeDisplayForm[activeQueryTabkey] = v;
     setTimeDisplayForm({...timeDisplayForm});
@@ -755,13 +808,24 @@ const Self = () => {
         visible={exportModalVisible}
         setVisible={setExportModalVisible}
         exportCsv={exportCsv}
-        activeQueryTabkey={activeQueryTabkey}
       />
       <ImportModal
         destroyOnClose={true}
         visible={importModalVisible}
         setVisible={setImportModalVisible}
-        activeQueryTabkey={activeQueryTabkey}
+      />
+      <DataExploreModal
+        destroyOnClose={true}
+        visible={dataExploreModalVisible}
+        setVisible={setDataExploreModalVisible}
+        columnName={exploreColumnName}
+        setColumnName={setExploreColumnName}
+        quantity={exploreDataQuantity}
+        average={exploreDataAverage}
+        max={exploreDataMax}
+        min={exploreDataMin}
+        variance={exploreDataVariance}
+        standardDeviation={exploreDataStandardDeviation}
       />
     </PageContainer>
   );
