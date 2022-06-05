@@ -6,11 +6,11 @@ import {
   ProFormTextArea,
   ProFormCheckbox,
 } from '@ant-design/pro-form';
-import { CloseCircleFilled, ReloadOutlined } from '@ant-design/icons';
+import { CloseCircleFilled, ReloadOutlined, EllipsisOutlined } from '@ant-design/icons';
 import React, { useState } from 'react';
 import styles from '../style.less';
 import { Input, Button, Result, Table, Tag, Space, Checkbox, Popover, Modal, Popconfirm, Select, Form,
-  notification } from 'antd';
+  notification, Tooltip } from 'antd';
 import { useRequest, useModel, useIntl } from 'umi';
 import { addTimeseriesWithTenantUsingPOST } from '@/services/swagger1/iotDbController';
 const OperationModal = (props) => {
@@ -55,7 +55,7 @@ const OperationModal = (props) => {
       key: 'granularity',
       render: text => (
         <>
-          {currentValue + '.' + text}
+          <div style={{width:300}}>{currentValue + '.' + text}</div>
         </>
       ),
     },
@@ -141,8 +141,9 @@ const OperationModal = (props) => {
             },
           ]}
           fieldProps={{
-            // style:{ width: 150 }
-            addonBefore: currentValue + '.'
+            addonBefore: <Tooltip placement="topLeft" arrowPointAtCenter
+             title={`${currentValue}.`}>
+              <EllipsisOutlined /></Tooltip>
           }}
           placeholder={intl.formatMessage({id: 'createStorageGroup.entity.description',})}
         />
@@ -168,7 +169,6 @@ const OperationModal = (props) => {
             },
           ]}
           fieldProps={{
-            // style:{ width: 150 }
           }}
           placeholder={intl.formatMessage({id: 'createStorageGroup.physical.description',})}
         />
@@ -194,7 +194,6 @@ const OperationModal = (props) => {
               setDataType2(val);
               form.setFieldsValue({encoding2:null})
             }
-            // style:{ width: 100 }
           }}
         />
       ),
@@ -214,7 +213,6 @@ const OperationModal = (props) => {
           ]}
           options={dataType2==null?[]:dataTypeEncodingMap[dataType2]}
           fieldProps={{
-            // style:{ width: 100 }
           }}
         />
       ),
@@ -241,6 +239,7 @@ const OperationModal = (props) => {
       form={form}
       title={intl.formatMessage({id: 'createStorageGroup.timeseries.detail',}) +
         ' -- ' + currentValue}
+      width={1200}
       className={styles.standardListForm}
       initialValues={current}
       submitter={{
@@ -283,7 +282,7 @@ const OperationModal = (props) => {
           searchTimeseries(currentValue,'');
         }}><ReloadOutlined />{intl.formatMessage({id: 'pages.refresh.text',})}</Button>
         <Input.Search
-          style={{width: '220px'}}
+          style={{width: 400}}
           placeholder={intl.formatMessage({id: 'createStorageGroup.timeseries.search.description',})}
            onSearch={(filter,e) => {
               e.preventDefault();
@@ -292,7 +291,9 @@ const OperationModal = (props) => {
             setSearchContent(e.target.value);
           }}
           value={searchContent}
-          addonBefore={currentValue+'.'}
+          addonBefore=<Tooltip placement="topLeft" arrowPointAtCenter
+           title={`${currentValue}.`}>
+            <EllipsisOutlined /></Tooltip>
           suffix={
               (searchContent==null||searchContent=='')?
               <CloseCircleFilled style={{ display: 'none' }} />:

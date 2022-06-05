@@ -160,7 +160,7 @@ const Self = () => {
       style={{ width:140 }} onChange={(v)=>{changeTimeDisplayForm(v)}}
      >
       <Option value="number">Number</Option>
-      <Option value="utc">UTC</Option>
+      <Option value="utc+8">UTC+8</Option>
     </Select>
     <Divider type="vertical" />
     <a onClick={()=>{

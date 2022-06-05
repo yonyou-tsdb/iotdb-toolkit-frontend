@@ -42,7 +42,7 @@ export const VisualMiniArea = (props: {}) => {
     yField: 'value',
     xAxis: {
       label: {
-        formatter: (v) => moment(parseInt(v)).utc().format('YYYY-MM-DD HH:mm:ss.SSS'),
+        formatter: (v) => moment(parseInt(v)).utcOffset(8).format('YYYY-MM-DD HH:mm:ss.SSS'),
       },
     },
     legend: {

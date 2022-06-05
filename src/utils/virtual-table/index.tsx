@@ -432,8 +432,8 @@ const BuildEditableTable = (props) => {
           </span>
         ) : (
           <span>
-          {timeDisplayForm[active]=='utc'?moment(parseInt(data[active][record.index-1].Time)).
-          utc().format('YYYY-MM-DD HH:mm:ss.SSS') : data[active][record.index-1].Time}
+          {timeDisplayForm[active]=='utc+8'?moment(parseInt(data[active][record.index-1].Time)).
+          utcOffset(8).format('YYYY-MM-DD HH:mm:ss.SSS') : data[active][record.index-1].Time}
           <div>
             <Typography.Link onClick={() => onEdit(record)}>
               edit

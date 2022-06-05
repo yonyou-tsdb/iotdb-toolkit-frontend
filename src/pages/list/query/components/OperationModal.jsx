@@ -71,7 +71,7 @@ const OperationModal = (props) => {
       key: 'sqls',
       width: '45%',
       render: text => (
-        <div>{text}</div>
+        <div style={{width:400}}>{text}</div>
       ),
     },
     {
@@ -111,6 +111,7 @@ const OperationModal = (props) => {
   return (
     <ModalForm
       visible={visible}
+      width={1000}
       form={form}
       title={intl.formatMessage({id: 'query.sql.script.view',})}
       className={styles.standardListForm}
